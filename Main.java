@@ -1,6 +1,8 @@
 import syntaxtree.*;
 import visitor.*;
 import java.io.*;
+import java.io.FileWriter;   // Import the FileWriter class
+
 
 public class Main {
     public static void main (String [] args) throws Exception {
@@ -19,6 +21,9 @@ public class Main {
             for (String s: args) {
                 System.out.println("Type check on program: "+s);
                 System.out.print("\n");    
+
+                String ll_file = s.replace(".java","");
+                ll_file = ll_file + ".ll";
 
                 //Parsing the input program.
                 fis = new FileInputStream(s);
@@ -64,6 +69,14 @@ public class Main {
                     continue;
                 }
 
+                FileWriter myWriter = new FileWriter(ll_file);
+                /*
+                if (ll_Obj.createNewFile()) {
+                    System.out.println("File created: " + ll_Obj.getName());
+                } else {
+                    System.out.println("File already exists.");
+                }*/
+
         
                 System.out.println("Our program is free of type errors, moving on to the offset table: ");    
                 System.out.print("\n");    
@@ -76,27 +89,29 @@ public class Main {
                 ClassTable last = eval.visitor_sym.get_last();
 
                 int last1 = 0;
-                for (String key : last.ot_table.keySet()) {
+                /*for (String key : last.ot_table.keySet()) {
                     System.out.println(last.ot_table.get(key));
                     last1 = last.ot_table.get(key);
-                }
+                }*/
 
-                /*
-                int size = last1;
-                if (last.last_type == "int" ){
-                    size = size + 4;
-                }
-                if(last.last_type == "boolean" ){
-                    size = size + 1;
-                    
-                }
-                if(last.last_type == "pointer" ){
-                    size = size + 8;
-                }
+                System.out.print("\n");    
 
-                System.out.println(size);
-                */
+                /*last1 = 0;
+                for (String key : last.v_table.keySet()) {
+                    System.out.println(last.v_table.get(key));
+                    last1 = last.v_table.get(key);
+                }*/
 
+                System.out.println(last.size);
+
+                ot.VTableCreator(myWriter);
+
+                ot.BoilerPlate(myWriter);
+
+                LLVM_Visitor ll_eval = new LLVM_Visitor(eval.visitor_sym,myWriter);
+                root.accept(ll_eval, null);
+
+                myWriter.close();
             }
 
         }

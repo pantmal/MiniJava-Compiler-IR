@@ -1,6 +1,8 @@
 import visitor.*;
 import syntaxtree.*;
 import java.util.*;
+import java.io.FileWriter;   // Import the FileWriter class
+import java.io.IOException;  // Import the IOException class to handle errors
 
 
 //Offset Table will create the offsets of a semantically correct Minijava program.
@@ -130,22 +132,31 @@ public class OffsetCreator {
 
                 String last_type_s = null;
 
+                int size = ot_sum;
+
                 //Storing the last type. It will be used if there is a child class that inherits from our current class.
                 if(last_type == "int" ){
                     last_type_s = "int";
+                    size = size + 4;
                 }
                 if(last_type == "boolean" ){
                     last_type_s = "boolean";
+                    size = size + 1;
                 }
                 if(last_type == "boolean[]" || last_type == "int[]" || visitor_sym.classId_table.containsKey(last_type) ){
                     last_type_s = "pointer";
+                    size = size + 8;
                 }
 
                 //Storing the field offset sum and last type in the Class Table, in case they are needed by a child class.
                 temp.ot_sum = ot_sum;
                 temp.last_type = last_type_s;
 
+                temp.size = size+8;
+
                 
+            }else{
+                temp.size = 8;
             }
 
             //Moving on to the method offsets.
@@ -154,6 +165,7 @@ public class OffsetCreator {
                 
                 int counter = 0; //Counter of which methodId we're on.
                 int mt_sum = 0; //Mt_sum is the sum of all metthod offsets.
+                int v_count = 0;
 
                 int last_count = 0; //Used in case we're in a hierarchy.
 
@@ -162,6 +174,7 @@ public class OffsetCreator {
                     //If we're in a hierarchy we need to skip overriden functions.
                     String new_mother = visitor_sym.mother_search(id,m_id);
                     if (new_mother != null){
+                        temp.over_insert(m_id);
                         continue;
                     }
 
@@ -170,10 +183,16 @@ public class OffsetCreator {
                         
                         if(temp.mother == null){
                             System.out.println(id+"."+m_id+" : 0" );
+                            temp.vt_insert(m_id,v_count);
+                            v_count++;
+
                         }else{
                             
                             //Getting the last offset sum from the mother class.
                             last_count = visitor_sym.find_methodId_table(id);
+
+                            v_count = visitor_sym.find_v_table(id);
+                            v_count++;
 
                             //-1 is returned in case the mother class is the Main. We must not add the offsets of the main function. So -1 is used to skip it.
                             if (last_count == -1){
@@ -183,11 +202,17 @@ public class OffsetCreator {
                             }
 
                             System.out.println(id+"."+m_id+" : "+last_count );
+                            temp.vt_insert(m_id,v_count);
+                            v_count++;
 
                             //Used for the next child classes.
                             mt_sum = last_count;
                         }
                     }else{ //If it's not the first item we will go to every previous field and create the sum.
+
+                        temp.vt_insert(m_id,v_count);
+                        v_count++;
+
                         int w_counter = counter;
                         w_counter--;
 
@@ -217,6 +242,7 @@ public class OffsetCreator {
 
                 //Storing the method offset sum in the Class Table.
                 temp.mt_sum = mt_sum;
+                temp.last_vcount = --v_count;
 
             }
 
@@ -224,6 +250,277 @@ public class OffsetCreator {
        }
 
     }
+
+    public String get_type(String type){
+        String return_type = null;
+        if(type == "int" ){
+            return_type = "i32";
+        }
+        if(type == "boolean" ){
+            return_type = "i1";
+        }
+        if(type == "boolean[]" || type == "int[]" || visitor_sym.classId_table.containsKey(type) ){
+            return_type = "i8*";
+        }
+
+        return return_type;
+    }
+
+
+    public void VTableCreator(FileWriter ll){
+
+        for (String id : visitor_sym.classId_table.keySet()) {
+            
+            ClassTable temp = visitor_sym.classId_table.get(id);
+
+            if (temp.mother == null){
+
+                try {
+                    if (temp.methodId_table!=null){
+                        if(temp.methodId_table.containsKey("main")){
+                            ll.write("@."+id+"_vtable = global [0 x i8*] [] \n");
+                            continue;
+                        }
+                    }
+
+                    if (temp.v_table!=null){
+                        int v_table_size = temp.get_last_v();
+                        v_table_size++;
+
+                        ll.write("@."+id+"_vtable = global [ "+v_table_size+ " x i8*] [  \n");
+                        if(temp.methodId_table!=null){
+                
+                            int m_count = 0;
+                            for (String m_id : temp.methodId_table.keySet()) {
+                                
+                                Tuple<String, MethodTable> tupe;
+                                tupe = temp.methodId_table.get(m_id);
+
+                                String return_type = get_type(tupe.x);
+                                
+                                ll.write("\ti8* bitcast ("+return_type+" (i8*");
+
+                                int p_count = 0 ;
+
+                                if (tupe.y.param_table == null){
+                                    ll.write(")*");
+                                }else{
+
+                                    ll.write(",");
+
+                                    int param_table_size = tupe.y.param_table.size();
+                                    for (String param : tupe.y.param_table.keySet()) {
+                                        
+                                        String type = tupe.y.param_table.get(param);
+                                        String output_type = get_type(type);
+
+                                        ll.write(output_type);
+                                        
+                                        p_count++;
+
+                                        if(p_count == param_table_size){
+                                            ll.write(")*");
+                                        }else{
+                                            ll.write(",");
+                                        }
+
+                                    }
+                                }
+                                
+                                ll.write(" @"+id+"."+m_id+" to i8*)");
+
+                                m_count++;
+                                if(m_count == v_table_size){
+                                    ll.write("\n]\n");
+                                }else{
+                                    ll.write(",\n");
+                                }
+
+
+                            }
+
+                        }
+
+                    }else{
+                        ll.write("@."+id+"_vtable = global [0 x i8*] [] \n");
+                    }
+
+
+                } catch (IOException e) {
+                    System.out.println("An error occurred.");
+                    e.printStackTrace();
+                }
+
+                
+
+            }else{
+                
+                try {
+                    Stack hierarchy = new Stack(); 
+                    visitor_sym.recurse_push(hierarchy,id);
+
+                    //Add checks!
+
+                    int v_table_size = 0;
+                    if(temp.v_table == null){
+                        v_table_size = visitor_sym.find_v_table(id);
+                        v_table_size++;
+                    }else{
+                        v_table_size = temp.get_last_v();
+                        v_table_size++;
+                    }
+
+                    
+
+                    ll.write("@."+id+"_vtable = global [ "+v_table_size+ " x i8*] [  \n");
+
+                    while(hierarchy.empty()==false){
+
+            
+                        String curr_id = (String) hierarchy.peek(); //Getting the last counter.
+                        ClassTable curr_temp = visitor_sym.classId_table.get(curr_id);
+
+                        if (curr_temp.v_table!=null){
+                                                        
+                            if(curr_temp.methodId_table!=null){
+                    
+                                int m_count = 0;
+                                for (String m_id : curr_temp.methodId_table.keySet()) {
+
+                                    if (m_count > 0){
+                                        ll.write(",\n");
+                                    }
+
+                                    String child_class = null;
+
+
+                                    for(int i = hierarchy.size() - 1; i >= 0; i--){
+                                        String obj = (String) hierarchy.get(i);
+                                        if(curr_id == obj){
+                                            continue;
+                                        }
+
+                                        ClassTable obj_temp = visitor_sym.classId_table.get(obj);
+
+                                        if(obj_temp.overriden_functions.contains(m_id)){
+                                            child_class = obj;
+                                        }
+                                    }
+            
+                                    
+                                    String new_mother = visitor_sym.mother_search(curr_id,m_id);
+                                    if (new_mother != null){
+                                        m_count++;
+                                        continue;
+                                    }
+                                    
+                                    Tuple<String, MethodTable> tupe;
+                                    tupe = curr_temp.methodId_table.get(m_id);
+
+                                    String return_type = get_type(tupe.x);
+                                    
+                                    ll.write("\ti8* bitcast ("+return_type+" (i8*");
+
+                                    int p_count = 0 ;
+                                    if (tupe.y.param_table == null){
+                                        ll.write(")*");
+                                    }else{
+
+                                        ll.write(",");
+
+                                        int param_table_size = tupe.y.param_table.size();
+                                        for (String param : tupe.y.param_table.keySet()) {
+                                            
+                                            String type = tupe.y.param_table.get(param);
+                                            String output_type = get_type(type);
+
+                                            ll.write(output_type);
+                                            
+                                            p_count++;
+
+                                            if(p_count == param_table_size){
+                                                ll.write(")*");
+                                            }else{
+                                                ll.write(",");
+                                            }
+
+                                        }
+                                    }
+                                    
+                                    
+                                    if (child_class == null){
+                                        ll.write(" @"+curr_id+"."+m_id+" to i8*)");
+                                    }else{
+                                        ll.write(" @"+child_class+"."+m_id+" to i8*)");
+                                    }
+
+                                    
+
+                                    m_count++;
+                                    
+                                
+
+
+                                }
+
+                            }
+
+                        }//else{
+                        //    ll.write("\n");
+                        //}
+                        hierarchy.pop();
+
+                    }
+
+                    ll.write("\n]\n");
+
+                }catch (IOException e) {
+                    System.out.println("An error occurred.");
+                    e.printStackTrace();
+                }
+
+
+            }
+
+        }
+
+    
+    
+    }
+
+
+    public void BoilerPlate(FileWriter ll){
+
+        try{
+
+            ll.write("\ndeclare i8* @calloc(i32, i32)\n");
+            ll.write("declare i32 @printf(i8*, ...)\n");
+            ll.write("declare void @exit(i32) \n \n");
+
+            ll.write("@_cint = constant [4 x i8] c\"%d\\0a\\00\" \n");
+            ll.write("@_cOOB = constant [15 x i8] c\"Out of bounds\\0a\\00\" \n");
+            ll.write("define void @print_int(i32 %i) { \n");
+            ll.write("\t%_str = bitcast [4 x i8]* @_cint to i8* \n");
+            ll.write("\tcall i32 (i8*, ...) @printf(i8* %_str, i32 %i) \n");
+            ll.write("\tret void \n");
+            ll.write("}\n \n");
+
+            ll.write("define void @throw_oob() {\n");
+            ll.write("\t%_str = bitcast [15 x i8]* @_cOOB to i8*\n");
+            ll.write("\tcall i32 (i8*, ...) @printf(i8* %_str)\n");
+            ll.write("\tcall void @exit(i32 1)\n");
+            ll.write("\tret void \n");
+            ll.write("}\n \n");
+        
+
+        }catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+
+
+    }
+
 
     
 }

@@ -1,5 +1,6 @@
 import java.util.LinkedHashMap;
 import java.util.Iterator;
+import java.util.*;
 
 //The SymbolTable.java file contains all the necessary structures for the implementation of our Symbol Table.
 
@@ -8,6 +9,44 @@ public class SymbolTable {
 
 
   LinkedHashMap<String, ClassTable> classId_table;
+
+
+  public void recurse_push(Stack hierarchy, String id){
+
+    hierarchy.push(id);
+
+    ClassTable current = this.get(id);
+
+    if (current.mother != null ){
+      ClassTable mom_table = this.get(current.mother);
+
+      hierarchy.push(current.mother);
+  
+      if (mom_table.mother != null ){
+        recurse_push(hierarchy,mom_table.mother);
+      }      
+    }
+
+
+  }
+
+
+  public int find_v_table(String id){
+
+    ClassTable current = this.get(id);
+    ClassTable mom_table = this.get(current.mother);
+
+    if (current.mother == null && current.v_table == null ){
+      return 0;
+    }
+
+    if (mom_table.v_table == null){
+      return find_v_table(current.mother); 
+    }else{
+      return mom_table.last_vcount;
+    }
+  
+  }
 
   //Is_child will search throughout the class hierarchy to see if the "child" argument has f_mother as a mother class.
   public boolean is_child(String f_mother, String child){
@@ -165,11 +204,39 @@ class ClassTable{
   public String last_type; //Last type in the field table. It is used for the creation of the Offset Table.
   public int ot_sum; //ot_sum contains the sum of the offsets from the fields. Its usage will be explained later on. 
   public int mt_sum; //Same thing as ot_sum but for the methods.
+  public int size;
+  public int last_vcount;
+  public List<String> overriden_functions;
   public LinkedHashMap<String, String> field_table ;
   public LinkedHashMap<String, Tuple<String,MethodTable>> methodId_table ;
   public LinkedHashMap<String, Integer> ot_table ;
   public LinkedHashMap<String, Integer> v_table ;
 
+
+  public void over_insert(String id){
+
+    if (overriden_functions == null){
+      overriden_functions = new ArrayList<>();
+    }
+
+    overriden_functions.add(id);
+
+  }
+
+
+    //Getting the last ClassTable of the classId table
+  public int get_last_v(){
+
+    String lKeyLast = null ;
+    for(String key : v_table.keySet()){
+      lKeyLast = key;
+    }
+
+    int size = v_table.get(lKeyLast);
+
+    return size;
+
+  }
 
   public void ot_insert(String id, int offset){
     if (ot_table == null){
