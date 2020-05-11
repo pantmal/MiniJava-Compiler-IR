@@ -23,7 +23,7 @@ define i32 @main() {
 	%x = alloca i32
 	store i32 0,i32* %x
 	store i32 10,i32* %x
-	%_1 = load i32, i32* %x
-	call void (i32) @print_int(i32 %_1)
+	%_0 = load i32, i32* %x
+	call void (i32) @print_int(i32 %_0)
 	ret i32 0
 }

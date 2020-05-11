@@ -156,7 +156,12 @@ public class OffsetCreator {
 
                 
             }else{
-                temp.size = 8;
+                if(temp.mother == null){
+                    temp.size = 8;
+                }else{
+                    temp.size = visitor_sym.find_size(id);
+                }
+                
             }
 
             //Moving on to the method offsets.
@@ -259,8 +264,11 @@ public class OffsetCreator {
         if(type == "boolean" ){
             return_type = "i1";
         }
-        if(type == "boolean[]" || type == "int[]" || visitor_sym.classId_table.containsKey(type) ){
+        if(type == "boolean[]" || visitor_sym.classId_table.containsKey(type) ){
             return_type = "i8*";
+        }
+        if(type == "int[]" ){
+            return_type = "i32*";
         }
 
         return return_type;
@@ -278,7 +286,7 @@ public class OffsetCreator {
                 try {
                     if (temp.methodId_table!=null){
                         if(temp.methodId_table.containsKey("main")){
-                            ll.write("@."+id+"_vtable = global [0 x i8*] [] \n");
+                            ll.write("@."+id+"_vtable = global [0 x i8*] [] \n \n");
                             continue;
                         }
                     }
@@ -331,7 +339,7 @@ public class OffsetCreator {
 
                                 m_count++;
                                 if(m_count == v_table_size){
-                                    ll.write("\n]\n");
+                                    ll.write("\n]\n \n");
                                 }else{
                                     ll.write(",\n");
                                 }
@@ -472,7 +480,7 @@ public class OffsetCreator {
 
                     }
 
-                    ll.write("\n]\n");
+                    ll.write("\n]\n \n");
 
                 }catch (IOException e) {
                     System.out.println("An error occurred.");

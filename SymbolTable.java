@@ -1,6 +1,8 @@
 import java.util.LinkedHashMap;
 import java.util.Iterator;
+import java.io.FileWriter;
 import java.util.*;
+import java.io.IOException;  // Import the IOException class to handle errors
 
 //The SymbolTable.java file contains all the necessary structures for the implementation of our Symbol Table.
 
@@ -44,6 +46,23 @@ public class SymbolTable {
       return find_v_table(current.mother); 
     }else{
       return mom_table.last_vcount;
+    }
+  
+  }
+
+  public int find_size(String id){
+
+    ClassTable current = this.get(id);
+    ClassTable mom_table = this.get(current.mother);
+
+    if (current.mother == null && current.size == 8 ){
+      return 0;
+    }
+
+    if (mom_table.size == 8 ){
+      return find_size(current.mother); 
+    }else{
+      return mom_table.size;
     }
   
   }
@@ -306,6 +325,79 @@ class ClassTable{
     }
 
   }
+
+  public String get_type(String type, LinkedHashMap<String, ClassTable> classId_table){
+    String return_type = null;
+    if(type == "int" ){
+        return_type = "i32";
+    }
+    if(type == "boolean" ){
+        return_type = "i1";
+    }
+    if(type == "boolean[]" || classId_table.containsKey(type) ){
+        return_type = "i8*";
+    }
+    if(type == "int[]" ){
+        return_type = "i32*";
+    }
+
+    return return_type;
+}
+
+  public String field_lookup(String id, LinkedHashMap<String, ClassTable> classId_table, int global_counter, FileWriter ll ){
+
+    String Type = null;
+    int offset = 0;
+    if( this.field_table != null  ){
+      if( this.field_table.containsKey(id) ) {
+        Type = this.field_table.get(id);
+        String output_type = get_type(Type, classId_table);
+        offset = this.ot_table.get(id);
+        String s_offset = String.valueOf(offset);//Now it will return "10"  
+
+        global_counter++;
+        String s = String.valueOf(global_counter);//Now it will return "10"  
+        String temps = "%_";
+        temps = temps+s;
+        
+        try {
+          ll.write("\t"+temps+" = getelementptr i8, i8* %this, "+output_type+" "+s_offset+"\n");
+        }catch (IOException e) {
+          System.out.println("An error occurred.");
+          e.printStackTrace();
+        }
+
+        global_counter++;
+        String s1 = String.valueOf(global_counter);//Now it will return "10"  
+        String temps1 = "%_";
+        temps1 = temps1+s1;
+
+        try{
+          ll.write("\t"+temps1+" = bitcast i8* "+temps+" to "+output_type+"* \n");
+        }catch (IOException e) {
+          System.out.println("An error occurred.");
+          e.printStackTrace();
+        }
+
+        return temps1;
+      }else{
+        if (this.mother != null ){
+          String reg = field_lookup(id,classId_table, global_counter, ll);
+          return reg;
+        }
+        return null;
+      }
+    }else{
+      if (this.mother != null ){
+        String reg = field_lookup(id,classId_table, global_counter, ll);
+        return reg;
+      }
+      return null;
+    }
+
+  }
+
+
 
   //f_insert adds a variable and its type to the field table.
   public void f_insert(String id, String type){
