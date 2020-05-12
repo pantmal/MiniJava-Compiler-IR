@@ -507,6 +507,7 @@ public class OffsetCreator {
 
             ll.write("@_cint = constant [4 x i8] c\"%d\\0a\\00\" \n");
             ll.write("@_cOOB = constant [15 x i8] c\"Out of bounds\\0a\\00\" \n");
+            ll.write("@_cNSZ = constant [15 x i8] c\"Negative Size\\0a\\00\" \n");
             ll.write("define void @print_int(i32 %i) { \n");
             ll.write("\t%_str = bitcast [4 x i8]* @_cint to i8* \n");
             ll.write("\tcall i32 (i8*, ...) @printf(i8* %_str, i32 %i) \n");
@@ -515,6 +516,13 @@ public class OffsetCreator {
 
             ll.write("define void @throw_oob() {\n");
             ll.write("\t%_str = bitcast [15 x i8]* @_cOOB to i8*\n");
+            ll.write("\tcall i32 (i8*, ...) @printf(i8* %_str)\n");
+            ll.write("\tcall void @exit(i32 1)\n");
+            ll.write("\tret void \n");
+            ll.write("}\n \n");
+
+            ll.write("define void @throw_nsz() {\n");
+            ll.write("\t%_str = bitcast [15 x i8]* @_cNSZ to i8*\n");
             ll.write("\tcall i32 (i8*, ...) @printf(i8* %_str)\n");
             ll.write("\tcall void @exit(i32 1)\n");
             ll.write("\tret void \n");

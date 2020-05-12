@@ -17,8 +17,10 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
 
     public FileWriter ll;
     int global_counter;
+    int label_counter;
     public boolean in_assign;
-    public boolean must_load;
+    public boolean not_load;
+    
     
     //The constructor gets the SymbolTable object. 
     public LLVM_Visitor(SymbolTable st, FileWriter ll_arg){ 
@@ -26,6 +28,7 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
         this.ll = ll_arg;   
 
         global_counter = -1;
+        label_counter = -1;
     }
 
     public String get_type(String type){
@@ -40,6 +43,7 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
             return_type = "i8*";
         }
         if(type == "int[]" ){
+          System.out.println("anyting");
           return_type = "i32*";
         }
 
@@ -175,7 +179,9 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
 
         ClassTable temp = visitor_sym.classId_table.get(curr_class);
 
+        
         String Type = n.f0.accept(this, argu);
+        System.out.println(Type);
         String output_type = get_type(Type);
 
         this.give_type = false;
@@ -277,7 +283,6 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
         n.f9.accept(this, argu);
 
         this.in_assign = true;
-        this.must_load = true;
         String expr_type = n.f10.accept(this, argu);
 
         ll.write("\tret "+output_type+" "+expr_type+"\n");
@@ -351,6 +356,7 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
     Tuple<String, MethodTable> tupe = temp.methodId_table.get(curr_meth);
 
     //Both parameter and local variable tables are null
+    this.not_load = true;
     if ( tupe.y.param_table == null && tupe.y.local_table == null  ){
       if ( temp.field_table != null  ){
         if( temp.field_table.containsKey(l_name) ) {
@@ -409,8 +415,10 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
         }
       }
     }
+    this.not_load = false;
 
 
+    global_counter = global_counter + 5;
     /*global_counter++;
     String s = String.valueOf(global_counter);//Now it will return "10"  
     String temps = "%_";
@@ -440,6 +448,206 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
     return _ret;
  }
 
+        /**
+    * f0 -> Identifier()
+    * f1 -> "["
+    * f2 -> Expression()
+    * f3 -> "]"
+    * f4 -> "="
+    * f5 -> Expression()
+    * f6 -> ";"
+    */
+    public String visit(ArrayAssignmentStatement n, String argu) throws Exception {
+      String _ret=null;
+
+      //Getting the left type.
+      this.give_type = true;
+      this.in_assign = false;
+      String l_Type = n.f0.accept(this, argu);
+
+      this.give_type = false;
+      this.in_assign = false;
+      String l_name = n.f0.accept(this, argu);
+      
+      ClassTable temp = visitor_sym.classId_table.get(curr_class);
+      Tuple<String, MethodTable> tupe = temp.methodId_table.get(curr_meth);
+
+      //Both parameter and local variable tables are null
+      this.not_load = true;
+      if ( tupe.y.param_table == null && tupe.y.local_table == null  ){
+        if ( temp.field_table != null  ){
+          if( temp.field_table.containsKey(l_name) ) {
+            l_name = field_access(temp, l_name);
+          }else{
+            l_name = mother_field_access(temp, l_name, global_counter);
+          }
+        }else{
+          l_name = mother_field_access(temp, l_name, global_counter);
+        }
+      }
+
+      //Only parameter table is null. 
+      if ( tupe.y.param_table == null && tupe.y.local_table != null  ){
+        if ( !tupe.y.local_table.containsKey(l_name)  ){
+          if ( temp.field_table != null  ){
+            if( temp.field_table.containsKey(l_name) ) {
+              l_name = field_access(temp, l_name);
+            }else{
+              l_name = mother_field_access(temp, l_name, global_counter);
+            }
+          }else{
+            l_name = mother_field_access(temp, l_name, global_counter);
+          }
+        }
+      }
+
+      //Only local table is null. 
+      if ( tupe.y.param_table != null && tupe.y.local_table == null  ){
+        if ( !tupe.y.param_table.containsKey(l_name)  ){
+          if ( temp.field_table != null  ){
+            if( temp.field_table.containsKey(l_name) ) {
+              l_name = field_access(temp, l_name);
+            }else{
+              l_name = mother_field_access(temp, l_name, global_counter);
+            }
+          }else{
+            l_name = mother_field_access(temp, l_name, global_counter);
+          }
+        }
+      }
+
+      //Both parameter and local tables have at least one variable.
+      if ( tupe.y.param_table != null && tupe.y.local_table != null  ){
+        if ( !tupe.y.param_table.containsKey(l_name)  ){
+          if ( !tupe.y.local_table.containsKey(l_name) ){
+            if ( temp.field_table != null  ){
+              if( temp.field_table.containsKey(l_name) ) {
+                l_name = field_access(temp, l_name);
+              }else{
+                l_name = mother_field_access(temp, l_name, global_counter);
+              }
+            }else{
+              l_name = mother_field_access(temp, l_name, global_counter);
+            }
+          }
+        }
+      }
+      this.not_load = false;
+      global_counter = global_counter + 5;
+
+      n.f1.accept(this, argu);
+      String index = n.f2.accept(this, argu);
+
+      n.f3.accept(this, argu);
+      n.f4.accept(this, argu);
+      String r_expr = n.f5.accept(this, argu);
+      n.f6.accept(this, argu);
+
+      global_counter++;
+      String s = String.valueOf(global_counter);//Now it will return "10"  
+      String temps = "%_";  
+      temps = temps+s;
+
+      //leave checks for boolean arrays
+
+      if (l_Type == "int[]"){
+        if(!l_name.startsWith("%")){
+          ll.write("\t"+temps+" = load i32*, i32** %"+l_name+"\n");
+        }else{
+          ll.write("\t"+temps+" = load i32*, i32** "+l_name+"\n");
+        }
+      }else{
+        if(!l_name.startsWith("%")){
+          ll.write("\t"+temps+" = load i8*, i8** %"+l_name+"\n");
+        }else{
+          ll.write("\t"+temps+" = load i8*, i8** "+l_name+"\n");
+        }
+      }
+
+      global_counter++;
+      String s1 = String.valueOf(global_counter);//Now it will return "10"  
+      String temps1 = "%_";  
+      temps1 = temps1+s1;
+
+      if (l_Type == "int[]"){
+        ll.write("\t"+temps1+" = load i32, i32* "+temps+"\n");
+      }else{
+        ll.write("\t"+temps1+" = bitcast i8* "+temps+" to i32* \n");
+
+        global_counter++;
+        String s11 = String.valueOf(global_counter);//Now it will return "10"  
+        String temps11 = "%_";  
+        temps11 = temps11+s11;
+        ll.write("\t"+temps11+" = load i32, i32* "+temps1+"\n");
+        temps1 = temps11;
+      }
+
+      global_counter++;
+      String s2 = String.valueOf(global_counter);//Now it will return "10"  
+      String temps2 = "%_";  
+      temps2 = temps2+s2;
+      ll.write("\t"+temps2+" = icmp sge i32 "+index+ ", 0\n");
+
+      global_counter++;
+      String s3 = String.valueOf(global_counter);//Now it will return "10"  
+      String temps3 = "%_";  
+      temps3 = temps3+s3;
+      ll.write("\t"+temps3+" = icmp slt i32 "+index+ ", "+temps1+"\n"); 
+
+      global_counter++;
+      String s4 = String.valueOf(global_counter);//Now it will return "10"  
+      String temps4 = "%_";  
+      temps4 = temps4+s4;
+      ll.write("\t"+temps4+" = and i1 "+temps2+ ", "+temps3+"\n"); 
+
+      label_counter++;
+      String l1 = String.valueOf(label_counter);//Now it will return "10"  
+      String label1 = "%oob_ok_";
+      label1 = label1 + l1;
+
+      String label2 = "%oob_err_";
+      label2 = label2 + l1;
+      ll.write("\tbr i1 "+temps4+", label "+label1+", label "+label2+"\n \n");
+
+      label2 = label2.replace("%","");
+      ll.write("\t"+label2+": \n");
+      ll.write("\tcall void @throw_oob()\n");
+      ll.write("\tbr label "+label1+"\n \n");
+
+      label1 = label1.replace("%","");
+      ll.write("\t"+label1+": \n");
+
+      global_counter++;
+      String s5 = String.valueOf(global_counter);//Now it will return "10"  
+      String temps5 = "%_";  
+      temps5 = temps5+s5;
+      if(l_Type == "int[]"){
+        ll.write("\t"+temps5+" = add i32 1, "+index+"\n"); 
+      }else{
+        ll.write("\t"+temps5+" = add i32 4, "+index+"\n"); 
+      }  
+
+      global_counter++;
+      String s6 = String.valueOf(global_counter);//Now it will return "10"  
+      String temps6 = "%_";  
+      temps6 = temps6+s6;
+      if(l_Type == "int[]"){
+        ll.write("\t"+temps6+" = getelementptr i32, i32* "+temps+", i32 "+temps5+"\n");
+        ll.write("\tstore i32 "+r_expr+", i32* "+temps6+"\n \n");
+      }else{
+        ll.write("\t"+temps6+" = getelementptr i8, i8* "+temps+", i32 "+temps5+"\n");
+
+        String zext = "%z";  
+        ll.write("\t"+zext+" = zext i1 "+r_expr+" to i8 \n");
+        ll.write("\tstore i8 "+zext+", i8* "+temps6+"\n \n");
+      }
+
+      return _ret;
+
+    }
+
+
+
     /**
     * f0 -> "System.out.println"
     * f1 -> "("
@@ -463,6 +671,276 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
         n.f4.accept(this, argu);
         return _ret;
      }
+
+     //AND EXPRESSION
+
+           /**
+    * f0 -> PrimaryExpression()
+    * f1 -> "<"
+    * f2 -> PrimaryExpression()
+    */
+    public String visit(CompareExpression n, String argu) throws Exception {
+      String _ret=null;
+      this.in_assign = true;
+      String L_expr = n.f0.accept(this, argu);
+  
+      n.f1.accept(this, argu);
+  
+      this.in_assign = true;
+      String R_expr = n.f2.accept(this, argu);
+  
+      global_counter++;
+      String s2 = String.valueOf(global_counter);//Now it will return "10"  
+      String temps2 = "%_";
+      temps2 = temps2+s2;
+  
+      ll.write("\t"+temps2+" = icmp slt i32 "+L_expr+", "+R_expr+"\n");
+    
+      return temps2;
+   }
+
+           /**
+    * f0 -> PrimaryExpression()
+    * f1 -> "+"
+    * f2 -> PrimaryExpression()
+    */
+    public String visit(PlusExpression n, String argu) throws Exception {
+      String _ret=null;
+
+      this.in_assign = true;
+      String L_expr = n.f0.accept(this, argu);
+  
+      n.f1.accept(this, argu);
+  
+      this.in_assign = true;
+      String R_expr = n.f2.accept(this, argu);
+  
+      global_counter++;
+      String s2 = String.valueOf(global_counter);//Now it will return "10"  
+      String temps2 = "%_";
+      temps2 = temps2+s2;
+  
+      ll.write("\t"+temps2+" = add i32 "+L_expr+", "+R_expr+"\n");
+    
+      return temps2;
+   }
+
+           /**
+    * f0 -> PrimaryExpression()
+    * f1 -> "-"
+    * f2 -> PrimaryExpression()
+    */
+    public String visit(MinusExpression n, String argu) throws Exception {
+      String _ret=null;
+
+      this.in_assign = true;
+      String L_expr = n.f0.accept(this, argu);
+  
+      n.f1.accept(this, argu);
+  
+      this.in_assign = true;
+      String R_expr = n.f2.accept(this, argu);
+  
+      global_counter++;
+      String s2 = String.valueOf(global_counter);//Now it will return "10"  
+      String temps2 = "%_";
+      temps2 = temps2+s2;
+  
+      ll.write("\t"+temps2+" = sub i32 "+L_expr+", "+R_expr+"\n");
+  
+      return temps2;
+   }
+
+
+
+        /**
+    * f0 -> PrimaryExpression()
+    * f1 -> "*"
+    * f2 -> PrimaryExpression()
+    */
+   public String visit(TimesExpression n, String argu) throws Exception {
+    String _ret=null;
+
+    this.in_assign = true;
+    String L_expr = n.f0.accept(this, argu);
+
+    n.f1.accept(this, argu);
+
+    this.in_assign = true;
+    String R_expr = n.f2.accept(this, argu);
+
+    global_counter++;
+    String s2 = String.valueOf(global_counter);//Now it will return "10"  
+    String temps2 = "%_";
+    temps2 = temps2+s2;
+
+    ll.write("\t"+temps2+" = mul i32 "+L_expr+", "+R_expr+"\n");
+
+    return temps2;
+ }
+
+
+       /**
+    * f0 -> PrimaryExpression()
+    * f1 -> "["
+    * f2 -> PrimaryExpression()
+    * f3 -> "]"
+    */
+    public String visit(ArrayLookup n, String argu) throws Exception {
+      String _ret=null;
+
+      String item_ret = null;
+
+      this.give_type = true;
+      this.in_assign = false;
+      String l_Type = n.f0.accept(this, argu);
+
+      //this.give_type = false;
+      //this.not_load = true;
+      this.give_type = false;
+      this.in_assign = true;
+      String temps = n.f0.accept(this, argu);
+
+      n.f1.accept(this, argu);
+      String index = n.f2.accept(this, argu);
+      n.f3.accept(this, argu);
+
+      /*global_counter++;
+      String s = String.valueOf(global_counter);//Now it will return "10"  
+      String temps = "%_";  
+      temps = temps+s;*/
+
+      //ll.write("\t"+temps+" = load i32*, i32** "+l_name+"\n");
+
+      global_counter++;
+      String s1 = String.valueOf(global_counter);//Now it will return "10"  
+      String temps1 = "%_";  
+      temps1 = temps1+s1;
+      
+      if (l_Type == "int[]"){
+        ll.write("\t"+temps1+" = load i32, i32* "+temps+"\n");
+      }else{
+        ll.write("\t"+temps1+" = bitcast i8* "+temps+" to i32* \n");
+
+        global_counter++;
+        String s11 = String.valueOf(global_counter);//Now it will return "10"  
+        String temps11 = "%_";  
+        temps11 = temps11+s11;
+        ll.write("\t"+temps11+" = load i32, i32* "+temps1+"\n");
+        temps1 = temps11;
+      }
+
+      global_counter++;
+      String s2 = String.valueOf(global_counter);//Now it will return "10"  
+      String temps2 = "%_";  
+      temps2 = temps2+s2;
+      ll.write("\t"+temps2+" = icmp sge i32 "+index+ ", 0\n");
+
+      global_counter++;
+      String s3 = String.valueOf(global_counter);//Now it will return "10"  
+      String temps3 = "%_";  
+      temps3 = temps3+s3;
+      ll.write("\t"+temps3+" = icmp slt i32 "+index+ ", "+temps1+"\n"); 
+
+      global_counter++;
+      String s4 = String.valueOf(global_counter);//Now it will return "10"  
+      String temps4 = "%_";  
+      temps4 = temps4+s4;
+      ll.write("\t"+temps4+" = and i1 "+temps2+ ", "+temps3+"\n"); 
+
+      label_counter++;
+      String l1 = String.valueOf(label_counter);//Now it will return "10"  
+      String label1 = "%oob_ok_";
+      label1 = label1 + l1;
+
+      String label2 = "%oob_err_";
+      label2 = label2 + l1;
+      ll.write("\tbr i1 "+temps4+", label "+label1+", label "+label2+"\n \n");
+
+      label2 = label2.replace("%","");
+      ll.write("\t"+label2+": \n");
+      ll.write("\tcall void @throw_oob()\n");
+      ll.write("\tbr label "+label1+"\n \n");
+
+      label1 = label1.replace("%","");
+      ll.write("\t"+label1+": \n");
+
+      global_counter++;
+      String s5 = String.valueOf(global_counter);//Now it will return "10"  
+      String temps5 = "%_";  
+      temps5 = temps5+s5;
+      if(l_Type == "int[]"){
+        ll.write("\t"+temps5+" = add i32 1, "+index+"\n"); 
+      }else{
+        ll.write("\t"+temps5+" = add i32 4, "+index+"\n"); 
+      }
+
+      global_counter++;
+      String s6 = String.valueOf(global_counter);//Now it will return "10"  
+      String temps6 = "%_";  
+      temps6 = temps6+s6;
+      if(l_Type == "int[]"){
+        ll.write("\t"+temps6+" = getelementptr i32, i32* "+temps+", i32 "+temps5+"\n");
+      }else{
+        ll.write("\t"+temps6+" = getelementptr i8, i8* "+temps+", i32 "+temps5+"\n");
+      }
+
+      global_counter++;
+      String s7 = String.valueOf(global_counter);//Now it will return "10"  
+      String temps7 = "%_";  
+      temps7 = temps7+s7;
+      if(l_Type == "int[]"){
+        ll.write("\t"+temps7+" = load i32, i32* "+temps6+"\n");
+      }else{
+        ll.write("\t"+temps7+" = load i8, i8* "+temps6+"\n");
+        String trunc = "%trunc";
+        ll.write("\t"+trunc+"= trunc i8 "+temps7+" to i1 \n");
+        temps7 = trunc;
+      }
+
+      return temps7;
+   }
+
+
+         /**
+    * f0 -> PrimaryExpression()
+    * f1 -> "."
+    * f2 -> "length"
+    */
+    public String visit(ArrayLength n, String argu) throws Exception {
+      String _ret=null;
+
+      this.give_type = true;
+      this.in_assign = false;
+      String l_Type = n.f0.accept(this, argu);
+      
+      this.give_type = false;
+      this.in_assign = true;
+      String temps = n.f0.accept(this, argu);
+
+      n.f1.accept(this, argu);
+      n.f2.accept(this, argu);
+
+      global_counter++;
+      String s1 = String.valueOf(global_counter);//Now it will return "10"  
+      String temps1 = "%_";  
+      temps1 = temps1+s1;
+      
+      if (l_Type == "int[]"){
+        ll.write("\t"+temps1+" = load i32, i32* "+temps+"\n");
+      }else{
+        ll.write("\t"+temps1+" = bitcast i8* "+temps+" to i32* \n");
+
+        global_counter++;
+        String s11 = String.valueOf(global_counter);//Now it will return "10"  
+        String temps11 = "%_";  
+        temps11 = temps11+s11;
+        ll.write("\t"+temps11+" = load i32, i32* "+temps1+"\n");
+        temps1 = temps11;
+      }
+
+      return temps1;
+   }
 
 
      /**
@@ -524,7 +1002,7 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
         e.printStackTrace();
       }
 
-      if (must_load == true){
+      if (not_load != true){
         global_counter++;
         String s2 = String.valueOf(global_counter);//Now it will return "10"  
         String temps2 = "%_";
@@ -537,10 +1015,9 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
           e.printStackTrace();
         }
 
-
-        must_load = false;
+        
         return temps2;
-      }
+      } 
 
       return temps1;
 
@@ -550,9 +1027,12 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
       
       if (temp.mother != null ){
         ClassTable mother_t = visitor_sym.classId_table.get(temp.mother);
-        String reg = mother_t.field_lookup(id, visitor_sym.classId_table, global_counter, ll ); //ADD THE BOOLEAN
-        global_counter = global_counter + 2;
+        String reg = mother_t.field_lookup(id, visitor_sym.classId_table, global_counter, ll, not_load ); 
+
+        global_counter = global_counter + 5;
+
         return reg;
+
         
       }
       return null;
@@ -565,6 +1045,7 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
       String output_type = get_type(Type);
       
       global_counter++;
+      //System.out.println(global_counter);
       String s = String.valueOf(global_counter);//Now it will return "10"  
       String temps = "%_";
       temps = temps+s;
@@ -858,6 +1339,152 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
         
     }
 
+ 
+ /* f0 -> "new"
+    * f1 -> "boolean"
+    * f2 -> "["
+    * f3 -> Expression()
+    * f4 -> "]"
+    */
+   public String visit(BooleanArrayAllocationExpression n, String argu) throws Exception {
+    String _ret=null;
+    n.f0.accept(this, argu);
+    n.f1.accept(this, argu);
+    n.f2.accept(this, argu);
+    String index = n.f3.accept(this, argu);
+
+    n.f4.accept(this, argu);
+
+    global_counter++;
+    String s = String.valueOf(global_counter);//Now it will return "10"  
+    String temps = "%_";
+    temps = temps+s;
+
+    ll.write("\t"+temps+" = add i32 1, "+index+"\n");
+
+    global_counter++;
+    String s1 = String.valueOf(global_counter);//Now it will return "10"  
+    String temps1 = "%_";
+    temps1 = temps1+s1;
+
+    label_counter++;
+    String l1 = String.valueOf(label_counter);//Now it will return "10"  
+    String label1 = "%nsz_ok_";
+    label1 = label1 + l1;
+
+    String label2 = "%nsz_err_";
+    label2 = label2 + l1;
+
+    ll.write("\t"+temps1+" = icmp sge i32 "+temps+", 1\n");
+    ll.write("\tbr i1 "+temps1+", label "+label1+", label "+label2+"\n \n");
+
+    label2 = label2.replace("%","");
+    ll.write("\t"+label2+": \n");
+    ll.write("\tcall void @throw_nsz()\n");
+    ll.write("\tbr label "+label1+"\n \n");
+
+    label1 = label1.replace("%","");
+    ll.write("\t"+label1+": \n");
+
+    global_counter++;
+    String s2 = String.valueOf(global_counter);//Now it will return "10"  
+    String temps2 = "%_";
+    temps2 = temps2+s2;
+
+    ll.write("\t"+temps2+" = add i32 4, "+index+"\n");
+
+    global_counter++;
+    String s3 = String.valueOf(global_counter);//Now it will return "10"  
+    String temps3 = "%_";
+    temps3 = temps3+s3;
+
+    ll.write("\t"+temps3+" = call i8* @calloc(i32 1, i32 "+temps2+") \n");
+
+    global_counter++;
+    String s4 = String.valueOf(global_counter);//Now it will return "10"  
+    String temps4 = "%_";
+    temps4 = temps4+s4;
+
+    ll.write("\t"+temps4+" = bitcast i8* "+temps3+" to i32* \n");
+    ll.write("\tstore i32 "+index+", i32* "+temps4+" \n");
+
+    global_counter++;
+    String s5 = String.valueOf(global_counter);//Now it will return "10"  
+    String temps5 = "%_";
+    temps5 = temps5+s5;
+
+    ll.write("\t"+temps5+" = bitcast i32* "+temps4+" to i8* \n");
+
+    return temps5;
+ }
+
+
+   /**
+    * f0 -> "new"
+    * f1 -> "int"
+    * f2 -> "["
+    * f3 -> Expression()
+    * f4 -> "]"
+    */
+    public String visit(IntegerArrayAllocationExpression n, String argu) throws Exception {
+      String _ret=null;
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+      n.f2.accept(this, argu);
+      String index = n.f3.accept(this, argu);
+
+      n.f4.accept(this, argu);
+
+      global_counter++;
+      String s = String.valueOf(global_counter);//Now it will return "10"  
+      String temps = "%_";
+      temps = temps+s;
+
+      ll.write("\t"+temps+" = add i32 1, "+index+"\n");
+
+      global_counter++;
+      String s1 = String.valueOf(global_counter);//Now it will return "10"  
+      String temps1 = "%_";
+      temps1 = temps1+s1;
+
+      label_counter++;
+      String l1 = String.valueOf(label_counter);//Now it will return "10"  
+      String label1 = "%nsz_ok_";
+      label1 = label1 + l1;
+
+      String label2 = "%nsz_err_";
+      label2 = label2 + l1;
+
+      ll.write("\t"+temps1+" = icmp sge i32 "+temps+", 1\n");
+      ll.write("\tbr i1 "+temps1+", label "+label1+", label "+label2+"\n \n");
+
+      label2 = label2.replace("%","");
+      ll.write("\t"+label2+": \n");
+      ll.write("\tcall void @throw_nsz()\n");
+      ll.write("\tbr label "+label1+"\n \n");
+
+      label1 = label1.replace("%","");
+      ll.write("\t"+label1+": \n");
+
+      global_counter++;
+      String s2 = String.valueOf(global_counter);//Now it will return "10"  
+      String temps2 = "%_";
+      temps2 = temps2+s2;
+
+      ll.write("\t"+temps2+" = call i8* @calloc(i32 "+temps+", i32 4) \n");
+
+      global_counter++;
+      String s3 = String.valueOf(global_counter);//Now it will return "10"  
+      String temps3 = "%_";
+      temps3 = temps3+s3;
+
+      ll.write("\t"+temps3+" = bitcast i8* "+temps2+" to i32* \n");
+      ll.write("\tstore i32 "+index+", i32* "+temps3+"\n \n");
+
+      return temps3;
+   }
+
+
        /**
     * f0 -> "new"
     * f1 -> Identifier()
@@ -914,13 +1541,6 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
     return temps;
  }
 
-    //%_3 = call i8* @calloc(i32 1, i32 12)
-    //%_4 = bitcast i8* %_3 to i8***
-    //%_5 = getelementptr [2 x i8*], [2 x i8*]* @.Derived_vtable, i32 0, i32 0
-    //store i8** %_5, i8*** %_4
-
-
-    //store i8* %_3, i8** %d
 
        /**
     * f0 -> <INTEGER_LITERAL>
@@ -963,6 +1583,43 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
       n.f2.accept(this, argu);
       
       return reg;
+   }
+
+
+       /**
+    * f0 -> "int"
+    * f1 -> "["
+    * f2 -> "]"
+    */
+    public String visit(IntegerArrayType n, String argu) throws Exception {
+      //R _ret=null;
+
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+      n.f2.accept(this, argu);
+
+      
+
+      return "int[]";
+   }
+
+
+   /**
+    * f0 -> "boolean"
+    * f1 -> "["
+    * f2 -> "]"
+    */
+    public String visit(BooleanArrayType n, String argu) throws Exception {
+     //R _ret=null;
+
+     n.f0.accept(this, argu);
+     n.f1.accept(this, argu);
+     n.f2.accept(this, argu);
+
+     
+
+     return "boolean[]";
+
    }
 
 

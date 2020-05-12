@@ -344,7 +344,7 @@ class ClassTable{
     return return_type;
 }
 
-  public String field_lookup(String id, LinkedHashMap<String, ClassTable> classId_table, int global_counter, FileWriter ll ){
+  public String field_lookup(String id, LinkedHashMap<String, ClassTable> classId_table, int global_counter, FileWriter ll, boolean not_load ){
 
     String Type = null;
     int offset = 0;
@@ -379,17 +379,34 @@ class ClassTable{
           e.printStackTrace();
         }
 
+        if (not_load != true){
+          global_counter++;
+          String s2 = String.valueOf(global_counter);//Now it will return "10"  
+          String temps2 = "%_";
+          temps2 = temps2+s2;
+
+          try{
+            ll.write("\t"+temps2+" = load "+output_type+", "+output_type+"* "+temps1+"\n");
+          }catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+          }
+
+          return temps2;
+        }
+
         return temps1;
+        
       }else{
         if (this.mother != null ){
-          String reg = field_lookup(id,classId_table, global_counter, ll);
+          String reg = field_lookup(id,classId_table, global_counter, ll, not_load);
           return reg;
         }
         return null;
       }
     }else{
       if (this.mother != null ){
-        String reg = field_lookup(id,classId_table, global_counter, ll);
+        String reg = field_lookup(id,classId_table, global_counter, ll, not_load);
         return reg;
       }
       return null;
