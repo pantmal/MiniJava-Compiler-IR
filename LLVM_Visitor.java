@@ -20,6 +20,8 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
     int label_counter;
     public boolean in_assign;
     public boolean not_load;
+    public Stack q_Stack;
+    public String hold_type;
     
     
     //The constructor gets the SymbolTable object. 
@@ -43,11 +45,21 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
             return_type = "i8*";
         }
         if(type == "int[]" ){
-          System.out.println("anyting");
           return_type = "i32*";
         }
 
         return return_type;
+    }
+
+    public String global_increment(){
+
+      global_counter++;
+      String s = String.valueOf(global_counter);//Now it will return "10"  
+      String temps = "%_";  
+      temps = temps+s;
+
+      return temps;
+
     }
 
        /**
@@ -76,6 +88,7 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
 
     //Setting the scope of the Main class and main method using the curr_class and curr_meth fields.
     this.give_type = false;
+    this.in_assign = false;
     String main_class = n.f1.accept(this, argu);
     this.curr_class = main_class;
 
@@ -93,6 +106,7 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
     n.f10.accept(this, argu);
 
     this.give_type = false;
+    this.in_assign = false;
     String id = n.f11.accept(this, argu);
 
     ll.write("define i32 @main() {\n");
@@ -105,7 +119,7 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
     n.f17.accept(this, argu);
     
     ll.write("\tret i32 0\n");
-    ll.write("}\n");
+    ll.write("}\n \n");
     return _ret;
  }
 
@@ -126,6 +140,7 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
     
         //Setting the scope of the current class we're on.
         this.give_type = false;
+        this.in_assign = false;
         String class_name = n.f1.accept(this, argu);
         this.curr_class = class_name;
     
@@ -154,12 +169,14 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
 
         //Setting the scope of the current class we're on.
         this.give_type = false;
+        this.in_assign = false;
         String class_name = n.f1.accept(this, argu);
         this.curr_class = class_name;
 
         n.f2.accept(this, argu);
         
         this.give_type = false;
+        this.in_assign = false;
         n.f3.accept(this, argu);
 
         n.f4.accept(this, argu);
@@ -179,22 +196,25 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
 
         ClassTable temp = visitor_sym.classId_table.get(curr_class);
 
-        
+        this.give_type = false;
+        this.in_assign = false;
         String Type = n.f0.accept(this, argu);
-        System.out.println(Type);
         String output_type = get_type(Type);
 
         this.give_type = false;
+        this.in_assign = false;
         String id = n.f1.accept(this, argu);
         
         if (temp.field_table != null){
           if (!temp.field_table.containsKey(id)){
             ll.write("\t%"+id+" = alloca "+output_type+"\n");
-            //ll.write("\tstore "+output_type+" 0,"+output_type+"* %"+id+"\n");
+            ll.write("\n");
+          }else{
+            ll.write(""); //BS1
           }
         }else{
           ll.write("\t%"+id+" = alloca "+output_type+"\n");
-          //ll.write("\tstore "+output_type+" 0,"+output_type+"* %"+id+"\n");
+          ll.write("\n");
         }
 
 
@@ -224,10 +244,14 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
 
         n.f0.accept(this, argu);
 
+        this.give_type = false;
+        this.in_assign = false;
         String ret_type = n.f1.accept(this, argu);
+        
 
         //Setting the scope of the current method we're on.
         this.give_type = false;
+        this.in_assign = false;
         String meth_name = n.f2.accept(this, argu);
         this.curr_meth = meth_name;
 
@@ -256,6 +280,7 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
         n.f5.accept(this, argu);
         n.f6.accept(this, argu);
 
+
         ll.write(") {\n");
         
         if( temp.methodId_table != null ){ 
@@ -283,6 +308,7 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
         n.f9.accept(this, argu);
 
         this.in_assign = true;
+        this.give_type = false;
         String expr_type = n.f10.accept(this, argu);
 
         ll.write("\tret "+output_type+" "+expr_type+"\n");
@@ -304,18 +330,19 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
     public String visit(FormalParameter n, String argu) throws Exception {
       String _ret=null;
 
-      
+
+      this.give_type = false;
+      this.in_assign = false;
       String Type = n.f0.accept(this, argu);
       String output_type = get_type(Type);
 
-      //this.in_assign = true;
+      this.in_assign = false;
+      this.give_type = false;
       String id = n.f1.accept(this, argu);
 
       ll.write(output_type+" %."+id);
-      //i32 %.x
 
       return _ret;
-
 
     }
 
@@ -346,9 +373,12 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
 
     //Getting the left type.
     this.give_type = true;
+    this.in_assign = false;
     String l_Type = n.f0.accept(this, argu);
+    String output_type = get_type(l_Type);
 
     this.give_type = false;
+    this.in_assign = false;
     String l_name = n.f0.accept(this, argu);
     
 
@@ -419,19 +449,13 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
 
 
     global_counter = global_counter + 5;
-    /*global_counter++;
-    String s = String.valueOf(global_counter);//Now it will return "10"  
-    String temps = "%_";
-    temps = temps+s;*/
-
-    String output_type = get_type(l_Type);
-    //ll.write("\t"+temps+" = load "+output_type+", "+output_type+"* %"+l_name);
 
   
     n.f1.accept(this, argu);
 
     //Getting the right type.
     this.in_assign = true;
+    this.give_type = false;
     String r_val = n.f2.accept(this, argu);
 
     if(l_name.startsWith("%")){
@@ -441,9 +465,9 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
     }
 
     
-    
     n.f3.accept(this, argu);
     this.give_type = false;
+    ll.write("\n");
 
     return _ret;
  }
@@ -536,17 +560,21 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
       global_counter = global_counter + 5;
 
       n.f1.accept(this, argu);
+
+      this.give_type = false;
+      this.in_assign = true;
       String index = n.f2.accept(this, argu);
 
       n.f3.accept(this, argu);
       n.f4.accept(this, argu);
+
+      this.in_assign = true;
+      this.give_type = false;
       String r_expr = n.f5.accept(this, argu);
       n.f6.accept(this, argu);
 
-      global_counter++;
-      String s = String.valueOf(global_counter);//Now it will return "10"  
-      String temps = "%_";  
-      temps = temps+s;
+      
+      String temps = global_increment();
 
       //leave checks for boolean arrays
 
@@ -564,40 +592,26 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
         }
       }
 
-      global_counter++;
-      String s1 = String.valueOf(global_counter);//Now it will return "10"  
-      String temps1 = "%_";  
-      temps1 = temps1+s1;
+      String temps1 = global_increment();
 
       if (l_Type == "int[]"){
         ll.write("\t"+temps1+" = load i32, i32* "+temps+"\n");
       }else{
         ll.write("\t"+temps1+" = bitcast i8* "+temps+" to i32* \n");
 
-        global_counter++;
-        String s11 = String.valueOf(global_counter);//Now it will return "10"  
-        String temps11 = "%_";  
-        temps11 = temps11+s11;
+        String temps11 = global_increment();
+
         ll.write("\t"+temps11+" = load i32, i32* "+temps1+"\n");
         temps1 = temps11;
       }
 
-      global_counter++;
-      String s2 = String.valueOf(global_counter);//Now it will return "10"  
-      String temps2 = "%_";  
-      temps2 = temps2+s2;
+      String temps2 = global_increment();
       ll.write("\t"+temps2+" = icmp sge i32 "+index+ ", 0\n");
 
-      global_counter++;
-      String s3 = String.valueOf(global_counter);//Now it will return "10"  
-      String temps3 = "%_";  
-      temps3 = temps3+s3;
+      String temps3 = global_increment();
       ll.write("\t"+temps3+" = icmp slt i32 "+index+ ", "+temps1+"\n"); 
 
-      global_counter++;
-      String s4 = String.valueOf(global_counter);//Now it will return "10"  
-      String temps4 = "%_";  
-      temps4 = temps4+s4;
+      String temps4 = global_increment();
       ll.write("\t"+temps4+" = and i1 "+temps2+ ", "+temps3+"\n"); 
 
       label_counter++;
@@ -617,36 +631,141 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
       label1 = label1.replace("%","");
       ll.write("\t"+label1+": \n");
 
-      global_counter++;
-      String s5 = String.valueOf(global_counter);//Now it will return "10"  
-      String temps5 = "%_";  
-      temps5 = temps5+s5;
+      String temps5 = global_increment();
       if(l_Type == "int[]"){
         ll.write("\t"+temps5+" = add i32 1, "+index+"\n"); 
       }else{
         ll.write("\t"+temps5+" = add i32 4, "+index+"\n"); 
       }  
 
-      global_counter++;
-      String s6 = String.valueOf(global_counter);//Now it will return "10"  
-      String temps6 = "%_";  
-      temps6 = temps6+s6;
+      String temps6 = global_increment();
       if(l_Type == "int[]"){
         ll.write("\t"+temps6+" = getelementptr i32, i32* "+temps+", i32 "+temps5+"\n");
         ll.write("\tstore i32 "+r_expr+", i32* "+temps6+"\n \n");
       }else{
         ll.write("\t"+temps6+" = getelementptr i8, i8* "+temps+", i32 "+temps5+"\n");
 
-        String zext = "%z";  
+        String zext = global_increment();
         ll.write("\t"+zext+" = zext i1 "+r_expr+" to i8 \n");
         ll.write("\tstore i8 "+zext+", i8* "+temps6+"\n \n");
       }
+      ll.write("\n");
 
       return _ret;
 
     }
 
 
+          /**
+    * f0 -> "if"
+    * f1 -> "("
+    * f2 -> Expression()
+    * f3 -> ")"
+    * f4 -> Statement()
+    * f5 -> "else"
+    * f6 -> Statement()
+    */
+    public String visit(IfStatement n, String argu) throws Exception {
+      String _ret=null;
+
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+
+
+      label_counter++;
+      String l1 = String.valueOf(label_counter);//Now it will return "10"  
+      String label1 = "%if_then_";
+      label1 = label1 + l1;
+
+      String label2 = "%if_else_" + l1;
+      String label3 = "%if_end_" + l1;
+
+      this.give_type = false;
+      this.in_assign = true;
+      String cond = n.f2.accept(this, argu);
+
+      ll.write("\tbr i1 "+cond+", label "+label1+", label "+label2+" \n");
+      
+      label2 = label2.replace("%","");
+      ll.write("\t"+label2+": \n");
+      
+      n.f6.accept(this, argu);
+
+      ll.write("\tbr label "+label3+"\n");
+      
+
+      //n.f3.accept(this, argu);
+
+      label1 = label1.replace("%","");
+      ll.write("\t"+label1+": \n");
+      
+      n.f4.accept(this, argu);
+
+      ll.write("\tbr label "+label3+"\n");
+
+      //n.f5.accept(this, argu);
+
+      label3 = label3.replace("%","");
+      ll.write("\t"+label3+": \n");
+
+      ll.write("\n");
+      
+      return _ret;
+   }
+
+      /**
+    * f0 -> "while"
+    * f1 -> "("
+    * f2 -> Expression()
+    * f3 -> ")"
+    * f4 -> Statement()
+    */
+    public String visit(WhileStatement n, String argu) throws Exception {
+      String _ret=null;
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+
+      label_counter++;
+      String l1 = String.valueOf(label_counter);//Now it will return "10"  
+      String label1 = "%loop" + l1;
+
+      label_counter++;
+      String l2 = String.valueOf(label_counter);//Now it will return "10"  
+      String label2 = "%loop" + l2;
+
+      label_counter++;
+      String l3 = String.valueOf(label_counter);//Now it will return "10"  
+      String label3 = "%loop" + l3;
+
+      ll.write("\tbr label "+label1+"\n");
+
+      label1 = label1.replace("%","");
+      ll.write("\t"+label1+": \n");
+
+
+      this.give_type = false;
+      this.in_assign = true;
+      String cond = n.f2.accept(this, argu);
+
+      ll.write("\tbr i1 "+cond+", label "+label2+", label "+label3+" \n");
+      
+      label2 = label2.replace("%","");
+      ll.write("\t"+label2+": \n");
+
+      //n.f3.accept(this, argu);
+
+
+      n.f4.accept(this, argu);
+
+      ll.write("\tbr label %"+label1+"\n");
+
+      label3 = label3.replace("%","");
+      ll.write("\t"+label3+": \n");
+
+      ll.write("\n");
+
+      return _ret;
+   }
 
     /**
     * f0 -> "System.out.println"
@@ -661,18 +780,77 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
         n.f1.accept(this, argu);
         
         this.give_type = false;
+        this.in_assign = true;
         String print_arg = n.f2.accept(this, argu);
         
 
         ll.write("\tcall void (i32) @print_int(i32 "+print_arg+")\n");
-        
+        ll.write("\n");
 
         n.f3.accept(this, argu);
         n.f4.accept(this, argu);
         return _ret;
      }
 
-     //AND EXPRESSION
+           /**
+    * f0 -> Clause()
+    * f1 -> "&&"
+    * f2 -> Clause()
+    */
+    public String visit(AndExpression n, String argu) throws Exception {
+      String _ret=null;
+
+      label_counter++;
+      String l1 = String.valueOf(label_counter);//Now it will return "10"  
+      String label1 = "%and_clause" + l1;
+
+      label_counter++;
+      String l2 = String.valueOf(label_counter);//Now it will return "10"  
+      String label2 = "%and_clause" + l2;
+
+      label_counter++;
+      String l3 = String.valueOf(label_counter);//Now it will return "10"  
+      String label3 = "%and_clause" + l3;
+
+      label_counter++;
+      String l4 = String.valueOf(label_counter);//Now it will return "10"  
+      String label4 = "%and_clause" + l4;
+
+      this.give_type = false;
+      this.in_assign = true;
+      String L_expr = n.f0.accept(this, argu);
+
+      ll.write("\tbr i1 "+L_expr+", label "+label2+", label "+label1+" \n");
+
+      label1 = label1.replace("%","");
+      ll.write("\t"+label1+": \n");
+      ll.write("\tbr label "+label3+"\n");
+  
+      //n.f1.accept(this, argu);
+
+      label2 = label2.replace("%","");
+      ll.write("\t"+label2+": \n");
+  
+      this.give_type = false;
+      this.in_assign = true;
+      String R_expr = n.f2.accept(this, argu);
+
+      ll.write("\tbr label "+label3+"\n");
+
+      label3 = label3.replace("%","");
+      ll.write("\t"+label3+": \n");
+      ll.write("\tbr label "+label4+"\n");
+
+      label4 = label4.replace("%","");
+      ll.write("\t"+label4+": \n");
+      
+      String temps2 = global_increment();
+      ll.write("\t"+temps2+" = phi i1 [ 0, %"+label1+" ], [ "+R_expr+", %"+label3+"] \n");
+
+      ll.write("\n");
+      
+      return temps2;
+   }
 
            /**
     * f0 -> PrimaryExpression()
@@ -681,21 +859,21 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
     */
     public String visit(CompareExpression n, String argu) throws Exception {
       String _ret=null;
+
+      this.give_type = false;
       this.in_assign = true;
       String L_expr = n.f0.accept(this, argu);
   
       n.f1.accept(this, argu);
   
+      this.give_type = false;
       this.in_assign = true;
       String R_expr = n.f2.accept(this, argu);
   
-      global_counter++;
-      String s2 = String.valueOf(global_counter);//Now it will return "10"  
-      String temps2 = "%_";
-      temps2 = temps2+s2;
+      String temps2 = global_increment();
   
       ll.write("\t"+temps2+" = icmp slt i32 "+L_expr+", "+R_expr+"\n");
-    
+      ll.write("\n");
       return temps2;
    }
 
@@ -707,21 +885,20 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
     public String visit(PlusExpression n, String argu) throws Exception {
       String _ret=null;
 
+      this.give_type = false;
       this.in_assign = true;
       String L_expr = n.f0.accept(this, argu);
   
       n.f1.accept(this, argu);
   
+      this.give_type = false;
       this.in_assign = true;
       String R_expr = n.f2.accept(this, argu);
   
-      global_counter++;
-      String s2 = String.valueOf(global_counter);//Now it will return "10"  
-      String temps2 = "%_";
-      temps2 = temps2+s2;
+      String temps2 = global_increment();
   
       ll.write("\t"+temps2+" = add i32 "+L_expr+", "+R_expr+"\n");
-    
+      ll.write("\n");
       return temps2;
    }
 
@@ -733,21 +910,20 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
     public String visit(MinusExpression n, String argu) throws Exception {
       String _ret=null;
 
+      this.give_type = false;
       this.in_assign = true;
       String L_expr = n.f0.accept(this, argu);
   
       n.f1.accept(this, argu);
   
+      this.give_type = false;
       this.in_assign = true;
       String R_expr = n.f2.accept(this, argu);
   
-      global_counter++;
-      String s2 = String.valueOf(global_counter);//Now it will return "10"  
-      String temps2 = "%_";
-      temps2 = temps2+s2;
+      String temps2 = global_increment();
   
       ll.write("\t"+temps2+" = sub i32 "+L_expr+", "+R_expr+"\n");
-  
+      ll.write("\n");
       return temps2;
    }
 
@@ -761,21 +937,20 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
    public String visit(TimesExpression n, String argu) throws Exception {
     String _ret=null;
 
+    this.give_type = false;
     this.in_assign = true;
     String L_expr = n.f0.accept(this, argu);
 
     n.f1.accept(this, argu);
 
+    this.give_type = false;
     this.in_assign = true;
     String R_expr = n.f2.accept(this, argu);
 
-    global_counter++;
-    String s2 = String.valueOf(global_counter);//Now it will return "10"  
-    String temps2 = "%_";
-    temps2 = temps2+s2;
+    String temps2 = global_increment();
 
     ll.write("\t"+temps2+" = mul i32 "+L_expr+", "+R_expr+"\n");
-
+    ll.write("\n");
     return temps2;
  }
 
@@ -795,57 +970,37 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
       this.in_assign = false;
       String l_Type = n.f0.accept(this, argu);
 
-      //this.give_type = false;
-      //this.not_load = true;
       this.give_type = false;
       this.in_assign = true;
       String temps = n.f0.accept(this, argu);
 
       n.f1.accept(this, argu);
+
+      this.give_type = false;
+      this.in_assign = true;
       String index = n.f2.accept(this, argu);
       n.f3.accept(this, argu);
 
-      /*global_counter++;
-      String s = String.valueOf(global_counter);//Now it will return "10"  
-      String temps = "%_";  
-      temps = temps+s;*/
-
-      //ll.write("\t"+temps+" = load i32*, i32** "+l_name+"\n");
-
-      global_counter++;
-      String s1 = String.valueOf(global_counter);//Now it will return "10"  
-      String temps1 = "%_";  
-      temps1 = temps1+s1;
+      
+      String temps1 = global_increment();
       
       if (l_Type == "int[]"){
         ll.write("\t"+temps1+" = load i32, i32* "+temps+"\n");
       }else{
         ll.write("\t"+temps1+" = bitcast i8* "+temps+" to i32* \n");
 
-        global_counter++;
-        String s11 = String.valueOf(global_counter);//Now it will return "10"  
-        String temps11 = "%_";  
-        temps11 = temps11+s11;
+        String temps11 = global_increment();
         ll.write("\t"+temps11+" = load i32, i32* "+temps1+"\n");
         temps1 = temps11;
       }
 
-      global_counter++;
-      String s2 = String.valueOf(global_counter);//Now it will return "10"  
-      String temps2 = "%_";  
-      temps2 = temps2+s2;
+      String temps2 = global_increment();
       ll.write("\t"+temps2+" = icmp sge i32 "+index+ ", 0\n");
 
-      global_counter++;
-      String s3 = String.valueOf(global_counter);//Now it will return "10"  
-      String temps3 = "%_";  
-      temps3 = temps3+s3;
+      String temps3 = global_increment();
       ll.write("\t"+temps3+" = icmp slt i32 "+index+ ", "+temps1+"\n"); 
 
-      global_counter++;
-      String s4 = String.valueOf(global_counter);//Now it will return "10"  
-      String temps4 = "%_";  
-      temps4 = temps4+s4;
+      String temps4 = global_increment();
       ll.write("\t"+temps4+" = and i1 "+temps2+ ", "+temps3+"\n"); 
 
       label_counter++;
@@ -865,39 +1020,30 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
       label1 = label1.replace("%","");
       ll.write("\t"+label1+": \n");
 
-      global_counter++;
-      String s5 = String.valueOf(global_counter);//Now it will return "10"  
-      String temps5 = "%_";  
-      temps5 = temps5+s5;
+      String temps5 = global_increment();
       if(l_Type == "int[]"){
         ll.write("\t"+temps5+" = add i32 1, "+index+"\n"); 
       }else{
         ll.write("\t"+temps5+" = add i32 4, "+index+"\n"); 
       }
 
-      global_counter++;
-      String s6 = String.valueOf(global_counter);//Now it will return "10"  
-      String temps6 = "%_";  
-      temps6 = temps6+s6;
+      String temps6 = global_increment();
       if(l_Type == "int[]"){
         ll.write("\t"+temps6+" = getelementptr i32, i32* "+temps+", i32 "+temps5+"\n");
       }else{
         ll.write("\t"+temps6+" = getelementptr i8, i8* "+temps+", i32 "+temps5+"\n");
       }
 
-      global_counter++;
-      String s7 = String.valueOf(global_counter);//Now it will return "10"  
-      String temps7 = "%_";  
-      temps7 = temps7+s7;
+      String temps7 = global_increment();
       if(l_Type == "int[]"){
         ll.write("\t"+temps7+" = load i32, i32* "+temps6+"\n");
       }else{
         ll.write("\t"+temps7+" = load i8, i8* "+temps6+"\n");
-        String trunc = "%trunc";
+        String trunc = global_increment();
         ll.write("\t"+trunc+"= trunc i8 "+temps7+" to i1 \n");
         temps7 = trunc;
       }
-
+      ll.write("\n");
       return temps7;
    }
 
@@ -921,26 +1067,216 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
       n.f1.accept(this, argu);
       n.f2.accept(this, argu);
 
-      global_counter++;
-      String s1 = String.valueOf(global_counter);//Now it will return "10"  
-      String temps1 = "%_";  
-      temps1 = temps1+s1;
+      String temps1 = global_increment();
       
       if (l_Type == "int[]"){
         ll.write("\t"+temps1+" = load i32, i32* "+temps+"\n");
       }else{
         ll.write("\t"+temps1+" = bitcast i8* "+temps+" to i32* \n");
 
-        global_counter++;
-        String s11 = String.valueOf(global_counter);//Now it will return "10"  
-        String temps11 = "%_";  
-        temps11 = temps11+s11;
+        String temps11 = global_increment();
         ll.write("\t"+temps11+" = load i32, i32* "+temps1+"\n");
         temps1 = temps11;
       }
-
+      ll.write("\n");
       return temps1;
    }
+
+      /**
+    * f0 -> PrimaryExpression()
+    * f1 -> "."
+    * f2 -> Identifier()
+    * f3 -> "("
+    * f4 -> ( ExpressionList() )?
+    * f5 -> ")"
+    */
+    public String visit(MessageSend n, String argu) throws Exception {
+      String _ret=null;
+
+      this.give_type = true;
+      this.in_assign = false;
+      String obj_type = n.f0.accept(this, argu);
+      
+      if (obj_type.contains("%")){
+        obj_type = hold_type;
+      }
+
+      this.give_type = false;
+      this.in_assign = true;
+      String temps = n.f0.accept(this, argu);
+
+      n.f1.accept(this, argu);
+    
+      this.give_type = false;
+      this.in_assign = false; 
+      String meth_name = n.f2.accept(this, argu);
+
+      ClassTable temp = visitor_sym.classId_table.get(obj_type);
+      
+      Tuple<String, MethodTable> tupe;
+
+      if (temp.methodId_table != null ){
+
+        if(temp.methodId_table.containsKey(meth_name)){
+          tupe = temp.methodId_table.get(meth_name);
+        }else{
+          String new_mother = visitor_sym.mother_search(obj_type,meth_name);
+          ClassTable mother_table = visitor_sym.get(new_mother);
+          tupe = mother_table.methodId_table.get(meth_name);
+        }
+
+      }else{
+        String new_mother = visitor_sym.mother_search(obj_type,meth_name);
+        ClassTable mother_table = visitor_sym.get(new_mother);
+        tupe = mother_table.methodId_table.get(meth_name);
+      }
+
+      int offset;
+      if(temp.v_table==null){
+
+        String new_mother = visitor_sym.mother_search(obj_type,meth_name); 
+        ClassTable mother_table = visitor_sym.get(new_mother);
+        
+        offset = mother_table.v_table.get(meth_name);
+      }else if(!temp.v_table.containsKey(meth_name)){
+        String new_mother = visitor_sym.mother_search(obj_type,meth_name); 
+        ClassTable mother_table = visitor_sym.get(new_mother);
+        
+        offset = mother_table.v_table.get(meth_name);
+      }else{
+        offset = temp.v_table.get(meth_name);
+      }
+
+      global_counter = global_counter + 3;
+      String temps1 = global_increment();
+      ll.write("\t"+temps1+" = bitcast i8* "+temps+" to i8*** \n");
+      
+      String temps2 = global_increment();
+      ll.write("\t"+temps2+" = load i8**, i8*** "+temps1+" \n");
+      
+      String temps3 = global_increment();
+      ll.write("\t"+temps3+" = getelementptr i8*, i8** "+temps2+", i32 "+offset+" \n");
+      
+      String temps4 = global_increment();
+      ll.write("\t"+temps4+" = load i8*, i8** "+temps3+" \n");
+      
+      String output_type = get_type(tupe.x);
+      String temps5 = global_increment();
+      ll.write("\t"+temps5+" = bitcast i8* "+temps4+" to "+output_type+" (i8* ");
+
+
+      if (tupe.y.param_table != null ){
+    
+        for (String i : tupe.y.param_table.keySet()) {
+
+          //Getting the type in our current method.
+          String curr_Type = tupe.y.param_table.get(i);
+          String output_type_arg = get_type(curr_Type);
+
+          ll.write(", ");
+          ll.write(output_type_arg);
+        }
+      }
+
+      ll.write(")* \n");
+
+      
+      if (tupe.y.param_table != null){
+      
+        Queue<String> paramQueue = new LinkedList<>();
+        
+        if ( q_Stack == null ){
+          q_Stack = new Stack();  
+        }
+
+        q_Stack.push(paramQueue);
+        
+
+      }
+
+      n.f3.accept(this, argu);
+      n.f4.accept(this, argu);
+      n.f5.accept(this, argu);
+
+      String temps6 = global_increment();
+      ll.write("\t"+temps6+" = call "+output_type+ " "+ temps5+"( i8* "+temps);
+
+      System.out.println(meth_name);
+
+      
+      if (tupe.y.param_table != null ){
+
+        Queue<String> paramQueue = (Queue<String>) q_Stack.pop();
+        for (String i : tupe.y.param_table.keySet()) {
+
+          //Getting the type in our current method.
+          String curr_Type = tupe.y.param_table.get(i);
+          String output_type_arg = get_type(curr_Type);
+
+          ll.write(", ");
+          ll.write(output_type_arg+" ");
+
+          String val = paramQueue.remove(); 
+          ll.write(val);
+        }
+      }
+
+      ll.write(") \n");
+      ll.write("\n");
+
+      this.hold_type = tupe.x;
+
+      return temps6;
+
+      //return _ret;
+   }
+
+      /**
+    * f0 -> Expression()
+    * f1 -> ExpressionTail()
+    */
+    public String visit(ExpressionList n, String argu) throws Exception {
+      String _ret=null;
+
+      this.give_type = false;
+      this.in_assign = true;
+      String temps = n.f0.accept(this, argu);
+
+      Queue<String> paramQueue = (Queue<String>) q_Stack.pop();
+      paramQueue.add(temps);
+      q_Stack.push(paramQueue);
+      
+      n.f1.accept(this, argu);
+      return _ret;
+   }
+
+   /**
+    * f0 -> ( ExpressionTerm() )*
+    */
+   public String visit(ExpressionTail n, String argu) throws Exception {
+      return n.f0.accept(this, argu);
+   }
+
+   /**
+    * f0 -> ","
+    * f1 -> Expression()
+    */
+   public String visit(ExpressionTerm n, String argu) throws Exception {
+      String  _ret=null;
+
+      n.f0.accept(this, argu);
+
+      this.give_type = false;
+      this.in_assign = true;
+      String temps = n.f1.accept(this, argu);
+
+      Queue<String> paramQueue = (Queue<String>) q_Stack.pop();
+      paramQueue.add(temps);
+      q_Stack.push(paramQueue);
+      
+      return _ret;
+   }
+
 
 
      /**
@@ -963,8 +1299,14 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
     * f0 -> "this"
     */
     public String visit(ThisExpression n, String argu) throws Exception {
-      n.f0.accept(this, argu);
-      return "%this";
+
+      if(give_type == true){
+        return this.curr_class;
+      }else{
+        return "%this";
+      }
+
+      
     }
 
 
@@ -978,22 +1320,16 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
       offset = temp.ot_table.get(id);
       String s_offset = String.valueOf(offset);//Now it will return "10"  
 
-      global_counter++;
-      String s = String.valueOf(global_counter);//Now it will return "10"  
-      String temps = "%_";
-      temps = temps+s;
+      String temps = global_increment();
       
       try{
-        ll.write("\t"+temps+" = getelementptr i8, i8* %this, "+output_type+" "+s_offset+"\n");
+        ll.write("\t"+temps+" = getelementptr i8, i8* %this, i32 "+s_offset+"\n");
       }catch (IOException e) {
         System.out.println("An error occurred.");
         e.printStackTrace();
       }
 
-      global_counter++;
-      String s1 = String.valueOf(global_counter);//Now it will return "10"  
-      String temps1 = "%_";
-      temps1 = temps1+s1;
+      String temps1 = global_increment();
 
       try{
         ll.write("\t"+temps1+" = bitcast i8* "+temps+" to "+output_type+"* \n");
@@ -1003,10 +1339,8 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
       }
 
       if (not_load != true){
-        global_counter++;
-        String s2 = String.valueOf(global_counter);//Now it will return "10"  
-        String temps2 = "%_";
-        temps2 = temps2+s2;
+        
+        String temps2 = global_increment();
 
         try{
           ll.write("\t"+temps2+" = load "+output_type+", "+output_type+"* "+temps1+"\n");
@@ -1026,10 +1360,12 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
     public String mother_field_access(ClassTable temp, String id, int global_counter ){
       
       if (temp.mother != null ){
+
+        global_counter = global_counter + 5; //BS2
         ClassTable mother_t = visitor_sym.classId_table.get(temp.mother);
         String reg = mother_t.field_lookup(id, visitor_sym.classId_table, global_counter, ll, not_load ); 
 
-        global_counter = global_counter + 5;
+        global_counter = global_counter + 5;//BS2
 
         return reg;
 
@@ -1044,11 +1380,7 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
       
       String output_type = get_type(Type);
       
-      global_counter++;
-      //System.out.println(global_counter);
-      String s = String.valueOf(global_counter);//Now it will return "10"  
-      String temps = "%_";
-      temps = temps+s;
+      String temps = global_increment();
       
       try{
         ll.write("\t"+temps+" = load "+output_type+", "+output_type+"* %"+id+"\n");
@@ -1062,7 +1394,6 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
 
     }
 
-    //%_0 = load i32, i32* %x
 
       /**
     * f0 -> <IDENTIFIER>
@@ -1351,21 +1682,18 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
     n.f0.accept(this, argu);
     n.f1.accept(this, argu);
     n.f2.accept(this, argu);
+
+    this.give_type = false;
+    this.in_assign = true;
     String index = n.f3.accept(this, argu);
 
     n.f4.accept(this, argu);
 
-    global_counter++;
-    String s = String.valueOf(global_counter);//Now it will return "10"  
-    String temps = "%_";
-    temps = temps+s;
+    String temps = global_increment();
 
     ll.write("\t"+temps+" = add i32 1, "+index+"\n");
 
-    global_counter++;
-    String s1 = String.valueOf(global_counter);//Now it will return "10"  
-    String temps1 = "%_";
-    temps1 = temps1+s1;
+    String temps1 = global_increment();
 
     label_counter++;
     String l1 = String.valueOf(label_counter);//Now it will return "10"  
@@ -1386,35 +1714,23 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
     label1 = label1.replace("%","");
     ll.write("\t"+label1+": \n");
 
-    global_counter++;
-    String s2 = String.valueOf(global_counter);//Now it will return "10"  
-    String temps2 = "%_";
-    temps2 = temps2+s2;
+    String temps2 = global_increment();
 
     ll.write("\t"+temps2+" = add i32 4, "+index+"\n");
 
-    global_counter++;
-    String s3 = String.valueOf(global_counter);//Now it will return "10"  
-    String temps3 = "%_";
-    temps3 = temps3+s3;
+    String temps3 = global_increment();
 
     ll.write("\t"+temps3+" = call i8* @calloc(i32 1, i32 "+temps2+") \n");
 
-    global_counter++;
-    String s4 = String.valueOf(global_counter);//Now it will return "10"  
-    String temps4 = "%_";
-    temps4 = temps4+s4;
+    String temps4 = global_increment();
 
     ll.write("\t"+temps4+" = bitcast i8* "+temps3+" to i32* \n");
     ll.write("\tstore i32 "+index+", i32* "+temps4+" \n");
 
-    global_counter++;
-    String s5 = String.valueOf(global_counter);//Now it will return "10"  
-    String temps5 = "%_";
-    temps5 = temps5+s5;
+    String temps5 = global_increment();
 
     ll.write("\t"+temps5+" = bitcast i32* "+temps4+" to i8* \n");
-
+    ll.write("\n");
     return temps5;
  }
 
@@ -1431,21 +1747,19 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
       n.f0.accept(this, argu);
       n.f1.accept(this, argu);
       n.f2.accept(this, argu);
+
+
+      this.give_type = false;
+      this.in_assign = true;
       String index = n.f3.accept(this, argu);
 
       n.f4.accept(this, argu);
 
-      global_counter++;
-      String s = String.valueOf(global_counter);//Now it will return "10"  
-      String temps = "%_";
-      temps = temps+s;
+      String temps = global_increment();
 
       ll.write("\t"+temps+" = add i32 1, "+index+"\n");
 
-      global_counter++;
-      String s1 = String.valueOf(global_counter);//Now it will return "10"  
-      String temps1 = "%_";
-      temps1 = temps1+s1;
+      String temps1 = global_increment();
 
       label_counter++;
       String l1 = String.valueOf(label_counter);//Now it will return "10"  
@@ -1466,21 +1780,15 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
       label1 = label1.replace("%","");
       ll.write("\t"+label1+": \n");
 
-      global_counter++;
-      String s2 = String.valueOf(global_counter);//Now it will return "10"  
-      String temps2 = "%_";
-      temps2 = temps2+s2;
+      String temps2 = global_increment();
 
       ll.write("\t"+temps2+" = call i8* @calloc(i32 "+temps+", i32 4) \n");
 
-      global_counter++;
-      String s3 = String.valueOf(global_counter);//Now it will return "10"  
-      String temps3 = "%_";
-      temps3 = temps3+s3;
+      String temps3 = global_increment();
 
       ll.write("\t"+temps3+" = bitcast i8* "+temps2+" to i32* \n");
       ll.write("\tstore i32 "+index+", i32* "+temps3+"\n \n");
-
+      ll.write("\n");
       return temps3;
    }
 
@@ -1494,51 +1802,54 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
    public String visit(AllocationExpression n, String argu) throws Exception {
     String _ret=null;
     n.f0.accept(this, argu);
-    
-    this.in_assign = false;
-    this.give_type = false;
-    String id = n.f1.accept(this, argu);
 
-    ClassTable temp = visitor_sym.classId_table.get(id);
-    int size = temp.size;
+    if(give_type == true){
 
-    global_counter++;
-    String s = String.valueOf(global_counter);//Now it will return "10"  
-    String temps = "%_";
-    temps = temps+s;
+      this.in_assign = false;
+      this.give_type = false;
+      String id = n.f1.accept(this, argu);  
+      return id;
 
-
-    ll.write("\t"+temps+" = call i8* @calloc(i32 1, i32 "+size+")\n");
-
-    global_counter++;
-    String s1 = String.valueOf(global_counter);//Now it will return "10"  
-    String temps1 = "%_";
-    temps1 = temps1+s1;
-
-    ll.write("\t"+temps1+" = bitcast i8* "+temps+" to i8*** \n");
-
-    global_counter++;
-    String s2 = String.valueOf(global_counter);//Now it will return "10"  
-    String temps2 = "%_";
-    temps2 = temps2+s2;
-
-    int v_table_size = 0;
-    if(temp.v_table == null){
-        v_table_size = visitor_sym.find_v_table(id);
-        v_table_size++;
     }else{
-        v_table_size = temp.get_last_v();
-        v_table_size++;
+    
+      this.in_assign = false;
+      this.give_type = false;
+      String id = n.f1.accept(this, argu);
+
+      ClassTable temp = visitor_sym.classId_table.get(id);
+      int size = temp.size;
+
+      String temps = global_increment();
+
+      ll.write("\t"+temps+" = call i8* @calloc(i32 1, i32 "+size+")\n");
+
+      String temps1 = global_increment();
+
+      ll.write("\t"+temps1+" = bitcast i8* "+temps+" to i8*** \n");
+
+      String temps2 = global_increment();
+
+      int v_table_size = 0;
+      if(temp.v_table == null){
+          v_table_size = visitor_sym.find_v_table(id);
+          v_table_size++;
+      }else{
+          v_table_size = temp.get_last_v();
+          v_table_size++;
+      }
+
+
+      ll.write("\t"+temps2+" = getelementptr ["+v_table_size+" x i8*], ["+v_table_size+" x i8*]* @."+id+"_vtable, i32 0, i32 0 \n");
+
+      ll.write("\tstore i8** "+temps2+", i8*** "+temps1+"\n");
+
+      n.f2.accept(this, argu);
+      n.f3.accept(this, argu);
+
+      ll.write("\n");
+      return temps;
     }
 
-
-    ll.write("\t"+temps2+" = getelementptr ["+v_table_size+" x i8*], ["+v_table_size+" x i8*]* @."+id+"_vtable, i32 0, i32 0 \n");
-
-    ll.write("\tstore i8** "+temps2+", i8*** "+temps1+"\n");
-
-    n.f2.accept(this, argu);
-    n.f3.accept(this, argu);
-    return temps;
  }
 
 
@@ -1557,16 +1868,16 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
     public String visit(NotExpression n, String argu) throws Exception {
       String _ret=null;
       n.f0.accept(this, argu);
+
+
+      this.give_type = false;
+      this.in_assign = true;
       String reg = n.f1.accept(this, argu);
 
-      global_counter++;
-      String s = String.valueOf(global_counter);//Now it will return "10"  
-      String temps = "%_";
-      temps = temps+s;
-
+      String temps = global_increment();
 
       ll.write(temps+" = xor i1 1, "+reg+"\n");
-
+      ll.write("\n");
       return temps;
     }
     
@@ -1578,7 +1889,9 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
     public String visit(BracketExpression n, String argu) throws Exception {
       String _ret=null;
       n.f0.accept(this, argu);
+      
       this.give_type = false;
+      this.in_assign = true;
       String reg = n.f1.accept(this, argu);
       n.f2.accept(this, argu);
       
@@ -1598,8 +1911,6 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
       n.f1.accept(this, argu);
       n.f2.accept(this, argu);
 
-      
-
       return "int[]";
    }
 
@@ -1615,8 +1926,6 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
      n.f0.accept(this, argu);
      n.f1.accept(this, argu);
      n.f2.accept(this, argu);
-
-     
 
      return "boolean[]";
 

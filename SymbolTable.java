@@ -39,7 +39,7 @@ public class SymbolTable {
     ClassTable mom_table = this.get(current.mother);
 
     if (current.mother == null && current.v_table == null ){
-      return 0;
+      return -1;
     }
 
     if (mom_table.v_table == null){
@@ -346,6 +346,7 @@ class ClassTable{
 
   public String field_lookup(String id, LinkedHashMap<String, ClassTable> classId_table, int global_counter, FileWriter ll, boolean not_load ){
 
+
     String Type = null;
     int offset = 0;
     if( this.field_table != null  ){
@@ -361,7 +362,7 @@ class ClassTable{
         temps = temps+s;
         
         try {
-          ll.write("\t"+temps+" = getelementptr i8, i8* %this, "+output_type+" "+s_offset+"\n");
+          ll.write("\t"+temps+" = getelementptr i8, i8* %this, i32 "+s_offset+"\n");
         }catch (IOException e) {
           System.out.println("An error occurred.");
           e.printStackTrace();
@@ -399,14 +400,16 @@ class ClassTable{
         
       }else{
         if (this.mother != null ){
-          String reg = field_lookup(id,classId_table, global_counter, ll, not_load);
+          ClassTable mother_t = classId_table.get(this.mother);
+          String reg = mother_t.field_lookup(id,classId_table, global_counter, ll, not_load);
           return reg;
         }
         return null;
       }
     }else{
       if (this.mother != null ){
-        String reg = field_lookup(id,classId_table, global_counter, ll, not_load);
+        ClassTable mother_t = classId_table.get(this.mother);
+        String reg = mother_t.field_lookup(id,classId_table, global_counter, ll, not_load);
         return reg;
       }
       return null;

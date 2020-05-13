@@ -2,11 +2,37 @@ class BooleanArrays {
 	public static void main(String[] a) {
 	    boolean[] x;
 	    boolean y;
+	    boolean z;
 	    x = new boolean[2];
 
         x[0] = true;
-       // x[1] = false;
-	//y = x[0];
+       	x[1] = false;
+	y = x[0];
+	z = x[1];
+
+	if(x[0]){
+		System.out.println(69);
+	}else{
+		System.out.println(10000);
+	}
+
+	if(y){
+		System.out.println(69);
+	}else{
+		System.out.println(10000);
+	}
+
+	if(x[1]){
+		System.out.println(10000);
+	}else{
+		System.out.println(420);
+	}
+
+	if(z){
+		System.out.println(10000);
+	}else{
+		System.out.println(420);
+	}
 
 	    System.out.println(x.length);
 	}

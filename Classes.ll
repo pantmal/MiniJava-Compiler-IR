@@ -17,6 +17,8 @@ declare void @exit(i32)
  
 @_cint = constant [4 x i8] c"%d\0a\00" 
 @_cOOB = constant [15 x i8] c"Out of bounds\0a\00" 
+@_cNSZ = constant [15 x i8] c"Negative Size\0a\00" 
+ 
 define void @print_int(i32 %i) { 
 	%_str = bitcast [4 x i8]* @_cint to i8* 
 	call i32 (i8*, ...) @printf(i8* %_str, i32 %i) 
@@ -30,56 +32,92 @@ define void @throw_oob() {
 	ret void 
 }
  
+define void @throw_nsz() {
+	%_str = bitcast [15 x i8]* @_cNSZ to i8*
+	call i32 (i8*, ...) @printf(i8* %_str)
+	call void @exit(i32 1)
+	ret void 
+}
+ 
 define i32 @main() {
 	%b = alloca i8*
+
 	%d = alloca i8*
+
 	%_5 = call i8* @calloc(i32 1, i32 12)
 	%_6 = bitcast i8* %_5 to i8*** 
 	%_7 = getelementptr [2 x i8*], [2 x i8*]* @.Base_vtable, i32 0, i32 0 
 	store i8** %_7, i8*** %_6
+
 	store i8* %_5,i8** %b
+
 	%_13 = call i8* @calloc(i32 1, i32 12)
 	%_14 = bitcast i8* %_13 to i8*** 
 	%_15 = getelementptr [2 x i8*], [2 x i8*]* @.Derived_vtable, i32 0, i32 0 
 	store i8** %_15, i8*** %_14
+
 	store i8* %_13,i8** %d
-	call void (i32) @print_int(i32 1)
-	%_21 = load i8*, i8** %d
-	store i8* %_21,i8** %b
-	call void (i32) @print_int(i32 3)
+
+	%_16 = load i8*, i8** %b
+	%_20 = bitcast i8* %_16 to i8*** 
+	%_21 = load i8**, i8*** %_20 
+	%_22 = getelementptr i8*, i8** %_21, i32 0 
+	%_23 = load i8*, i8** %_22 
+	%_24 = bitcast i8* %_23 to i32 (i8* , i32)* 
+	%_25 = call i32 %_24( i8* %_16, i32 1) 
+
+	call void (i32) @print_int(i32 %_25)
+
+	%_31 = load i8*, i8** %d
+	store i8* %_31,i8** %b
+
+	%_32 = load i8*, i8** %b
+	%_36 = bitcast i8* %_32 to i8*** 
+	%_37 = load i8**, i8*** %_36 
+	%_38 = getelementptr i8*, i8** %_37, i32 0 
+	%_39 = load i8*, i8** %_38 
+	%_40 = bitcast i8* %_39 to i32 (i8* , i32)* 
+	%_41 = call i32 %_40( i8* %_32, i32 3) 
+
+	call void (i32) @print_int(i32 %_41)
+
 	ret i32 0
 }
+ 
 define i32 @Base.set(i8* %this, i32 %.x) {
 	%x = alloca i32
 	store i32 %.x, i32* %x
-	%_22 = getelementptr i8, i8* %this, i32 8
-	%_23 = bitcast i8* %_22 to i32* 
-	%_29 = load i32, i32* %x
-	store i32 %_29,i32* %_23
-	%_30 = getelementptr i8, i8* %this, i32 8
-	%_31 = bitcast i8* %_30 to i32* 
-	%_32 = load i32, i32* %_31
-	ret i32 %_32
+	%_42 = getelementptr i8, i8* %this, i32 8
+	%_43 = bitcast i8* %_42 to i32* 
+	%_49 = load i32, i32* %x
+	store i32 %_49,i32* %_43
+
+	%_50 = getelementptr i8, i8* %this, i32 8
+	%_51 = bitcast i8* %_50 to i32* 
+	%_52 = load i32, i32* %_51
+	ret i32 %_52
 }
  
 define i32 @Base.get(i8* %this) {
-	%_33 = getelementptr i8, i8* %this, i32 8
-	%_34 = bitcast i8* %_33 to i32* 
-	%_35 = load i32, i32* %_34
-	ret i32 %_35
+	%_53 = getelementptr i8, i8* %this, i32 8
+	%_54 = bitcast i8* %_53 to i32* 
+	%_55 = load i32, i32* %_54
+	ret i32 %_55
 }
  
 define i32 @Derived.set(i8* %this, i32 %.x) {
 	%x = alloca i32
 	store i32 %.x, i32* %x
-	%_36 = getelementptr i8, i8* %this, i32 8
-	%_37 = bitcast i8* %_36 to i32* 
-	%_41 = load i32, i32* %x
-	%_42 = mul i32 %_41, 2
-	store i32 %_42,i32* %_37
-	%_43 = getelementptr i8, i8* %this, i32 8
-	%_44 = bitcast i8* %_43 to i32* 
-	%_45 = load i32, i32* %_44
-	ret i32 %_45
+	%_56 = getelementptr i8, i8* %this, i32 8
+	%_57 = bitcast i8* %_56 to i32* 
+	%_61 = load i32, i32* %x
+	%_62 = mul i32 %_61, 2
+
+	store i32 %_62,i32* %_57
+
+	%_63 = getelementptr i8, i8* %this, i32 8
+	%_64 = bitcast i8* %_63 to i32* 
+	%_65 = load i32, i32* %_64
+	ret i32 %_65
 }
  

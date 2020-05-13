@@ -6,11 +6,11 @@ class Classes {
   		b = new Base();
  		d = new Derived();
 
-		System.out.println(1);
+		System.out.println(b.set(1));
 
 		b = d;
 
-		System.out.println(3);
+		System.out.println(b.set(3));
 	}
 }
 

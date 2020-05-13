@@ -382,19 +382,21 @@ public class OffsetCreator {
 
                     ll.write("@."+id+"_vtable = global [ "+v_table_size+ " x i8*] [  \n");
 
+                    int m_count = 0;
                     while(hierarchy.empty()==false){
 
-            
+        
                         String curr_id = (String) hierarchy.peek(); //Getting the last counter.
                         ClassTable curr_temp = visitor_sym.classId_table.get(curr_id);
 
+                        
                         if (curr_temp.v_table!=null){
                                                         
                             if(curr_temp.methodId_table!=null){
                     
-                                int m_count = 0;
                                 for (String m_id : curr_temp.methodId_table.keySet()) {
 
+                                    
                                     if (m_count > 0){
                                         ll.write(",\n");
                                     }
@@ -410,8 +412,10 @@ public class OffsetCreator {
 
                                         ClassTable obj_temp = visitor_sym.classId_table.get(obj);
 
-                                        if(obj_temp.overriden_functions.contains(m_id)){
-                                            child_class = obj;
+                                        if(obj_temp.overriden_functions != null){
+                                            if(obj_temp.overriden_functions.contains(m_id)){
+                                                child_class = obj;
+                                            }
                                         }
                                     }
             
@@ -462,14 +466,11 @@ public class OffsetCreator {
                                         ll.write(" @"+child_class+"."+m_id+" to i8*)");
                                     }
 
-                                    
 
                                     m_count++;
-                                    
-                                
-
-
+                                                            
                                 }
+                                m_count++;
 
                             }
 
@@ -507,7 +508,7 @@ public class OffsetCreator {
 
             ll.write("@_cint = constant [4 x i8] c\"%d\\0a\\00\" \n");
             ll.write("@_cOOB = constant [15 x i8] c\"Out of bounds\\0a\\00\" \n");
-            ll.write("@_cNSZ = constant [15 x i8] c\"Negative Size\\0a\\00\" \n");
+            ll.write("@_cNSZ = constant [15 x i8] c\"Negative Size\\0a\\00\" \n \n");
             ll.write("define void @print_int(i32 %i) { \n");
             ll.write("\t%_str = bitcast [4 x i8]* @_cint to i8* \n");
             ll.write("\tcall i32 (i8*, ...) @printf(i8* %_str, i32 %i) \n");
