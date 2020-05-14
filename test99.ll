@@ -55,26 +55,26 @@ define i32 @main() {
 define i32 @Test.start(i8* %this) {
 	%_12 = getelementptr i8, i8* %this, i32 8
 	%_13 = bitcast i8* %_12 to i8** 
-	%_19 = call i8* @calloc(i32 1, i32 20)
-	%_20 = bitcast i8* %_19 to i8*** 
-	%_21 = getelementptr [2 x i8*], [2 x i8*]* @.Test_vtable, i32 0, i32 0 
-	store i8** %_21, i8*** %_20
+	%_14 = call i8* @calloc(i32 1, i32 20)
+	%_15 = bitcast i8* %_14 to i8*** 
+	%_16 = getelementptr [2 x i8*], [2 x i8*]* @.Test_vtable, i32 0, i32 0 
+	store i8** %_16, i8*** %_15
 
-	store i8* %_19,i8** %_13
+	store i8* %_14,i8** %_13
 
-	%_22 = getelementptr i8, i8* %this, i32 16
-	%_23 = bitcast i8* %_22 to i32* 
-	%_29 = getelementptr i8, i8* %this, i32 8
-	%_30 = bitcast i8* %_29 to i8** 
-	%_31 = load i8*, i8** %_30
-	%_35 = bitcast i8* %_31 to i8*** 
-	%_36 = load i8**, i8*** %_35 
-	%_37 = getelementptr i8*, i8** %_36, i32 1 
-	%_38 = load i8*, i8** %_37 
-	%_39 = bitcast i8* %_38 to i32 (i8* , i8*)* 
-	%_40 = call i32 %_39( i8* %_31, i8* %this) 
+	%_17 = getelementptr i8, i8* %this, i32 16
+	%_18 = bitcast i8* %_17 to i32* 
+	%_19 = getelementptr i8, i8* %this, i32 8
+	%_20 = bitcast i8* %_19 to i8** 
+	%_21 = load i8*, i8** %_20
+	%_25 = bitcast i8* %_21 to i8*** 
+	%_26 = load i8**, i8*** %_25 
+	%_27 = getelementptr i8*, i8** %_26, i32 1 
+	%_28 = load i8*, i8** %_27 
+	%_29 = bitcast i8* %_28 to i32 (i8* , i8*)* 
+	%_30 = call i32 %_29( i8* %_21, i8* %this) 
 
-	store i32 %_40,i32* %_23
+	store i32 %_30,i32* %_18
 
 	ret i32 0
 }

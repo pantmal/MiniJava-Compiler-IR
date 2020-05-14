@@ -58,121 +58,119 @@ define i32 @Test.start(i8* %this) {
 	%_13 = bitcast i8* %_12 to i32* 
 	store i32 4,i32* %_13
 
-	%_19 = getelementptr i8, i8* %this, i32 12
-	%_20 = bitcast i8* %_19 to i32* 
-	store i32 0,i32* %_20
+	%_14 = getelementptr i8, i8* %this, i32 12
+	%_15 = bitcast i8* %_14 to i32* 
+	store i32 0,i32* %_15
 
-	%_29 = bitcast i8* %this to i8*** 
-	%_30 = load i8**, i8*** %_29 
-	%_31 = getelementptr i8*, i8** %_30, i32 1 
-	%_32 = load i8*, i8** %_31 
-	%_33 = bitcast i8* %_32 to i32 (i8* )* 
-	%_34 = call i32 %_33( i8* %this) 
+	%_19 = bitcast i8* %this to i8*** 
+	%_20 = load i8**, i8*** %_19 
+	%_21 = getelementptr i8*, i8** %_20, i32 1 
+	%_22 = load i8*, i8** %_21 
+	%_23 = bitcast i8* %_22 to i32 (i8* )* 
+	%_24 = call i32 %_23( i8* %this) 
 
-	ret i32 %_34
+	ret i32 %_24
 }
  
 define i32 @Test.mutual1(i8* %this) {
 	%j = alloca i32
+	%_25 = getelementptr i8, i8* %this, i32 8
+	%_26 = bitcast i8* %_25 to i32* 
+	%_27 = getelementptr i8, i8* %this, i32 8
+	%_28 = bitcast i8* %_27 to i32* 
+	%_29 = load i32, i32* %_28
+	%_30 = sub i32 %_29, 1
 
-	%_35 = getelementptr i8, i8* %this, i32 8
-	%_36 = bitcast i8* %_35 to i32* 
-	%_42 = getelementptr i8, i8* %this, i32 8
-	%_43 = bitcast i8* %_42 to i32* 
-	%_44 = load i32, i32* %_43
-	%_45 = sub i32 %_44, 1
+	store i32 %_30,i32* %_26
 
-	store i32 %_45,i32* %_36
+	%_31 = getelementptr i8, i8* %this, i32 8
+	%_32 = bitcast i8* %_31 to i32* 
+	%_33 = load i32, i32* %_32
+	%_34 = icmp slt i32 %_33, 0
 
-	%_46 = getelementptr i8, i8* %this, i32 8
-	%_47 = bitcast i8* %_46 to i32* 
-	%_48 = load i32, i32* %_47
-	%_49 = icmp slt i32 %_48, 0
-
-	br i1 %_49, label %if_then_0, label %if_else_0 
+	br i1 %_34, label %if_then_0, label %if_else_0 
 	if_else_0: 
-	%_50 = getelementptr i8, i8* %this, i32 12
-	%_51 = bitcast i8* %_50 to i32* 
-	%_52 = load i32, i32* %_51
-	call void (i32) @print_int(i32 %_52)
+	%_35 = getelementptr i8, i8* %this, i32 12
+	%_36 = bitcast i8* %_35 to i32* 
+	%_37 = load i32, i32* %_36
+	call void (i32) @print_int(i32 %_37)
 
-	%_53 = getelementptr i8, i8* %this, i32 12
-	%_54 = bitcast i8* %_53 to i32* 
-	store i32 1,i32* %_54
+	%_38 = getelementptr i8, i8* %this, i32 12
+	%_39 = bitcast i8* %_38 to i32* 
+	store i32 1,i32* %_39
 
-	%_68 = bitcast i8* %this to i8*** 
-	%_69 = load i8**, i8*** %_68 
-	%_70 = getelementptr i8*, i8** %_69, i32 2 
-	%_71 = load i8*, i8** %_70 
-	%_72 = bitcast i8* %_71 to i32 (i8* )* 
-	%_73 = call i32 %_72( i8* %this) 
+	%_43 = bitcast i8* %this to i8*** 
+	%_44 = load i8**, i8*** %_43 
+	%_45 = getelementptr i8*, i8** %_44, i32 2 
+	%_46 = load i8*, i8** %_45 
+	%_47 = bitcast i8* %_46 to i32 (i8* )* 
+	%_48 = call i32 %_47( i8* %this) 
 
-	store i32 %_73,i32* %j
+	store i32 %_48,i32* %j
 
 	br label %if_end_0
 	if_then_0: 
-	%_74 = getelementptr i8, i8* %this, i32 12
-	%_75 = bitcast i8* %_74 to i32* 
-	store i32 0,i32* %_75
+	%_49 = getelementptr i8, i8* %this, i32 12
+	%_50 = bitcast i8* %_49 to i32* 
+	store i32 0,i32* %_50
 
 	br label %if_end_0
 	if_end_0: 
 
-	%_81 = getelementptr i8, i8* %this, i32 12
-	%_82 = bitcast i8* %_81 to i32* 
-	%_83 = load i32, i32* %_82
-	ret i32 %_83
+	%_51 = getelementptr i8, i8* %this, i32 12
+	%_52 = bitcast i8* %_51 to i32* 
+	%_53 = load i32, i32* %_52
+	ret i32 %_53
 }
  
 define i32 @Test.mutual2(i8* %this) {
 	%j = alloca i32
+	%_54 = getelementptr i8, i8* %this, i32 8
+	%_55 = bitcast i8* %_54 to i32* 
+	%_56 = getelementptr i8, i8* %this, i32 8
+	%_57 = bitcast i8* %_56 to i32* 
+	%_58 = load i32, i32* %_57
+	%_59 = sub i32 %_58, 1
 
-	%_84 = getelementptr i8, i8* %this, i32 8
-	%_85 = bitcast i8* %_84 to i32* 
-	%_91 = getelementptr i8, i8* %this, i32 8
-	%_92 = bitcast i8* %_91 to i32* 
-	%_93 = load i32, i32* %_92
-	%_94 = sub i32 %_93, 1
+	store i32 %_59,i32* %_55
 
-	store i32 %_94,i32* %_85
+	%_60 = getelementptr i8, i8* %this, i32 8
+	%_61 = bitcast i8* %_60 to i32* 
+	%_62 = load i32, i32* %_61
+	%_63 = icmp slt i32 %_62, 0
 
-	%_95 = getelementptr i8, i8* %this, i32 8
-	%_96 = bitcast i8* %_95 to i32* 
-	%_97 = load i32, i32* %_96
-	%_98 = icmp slt i32 %_97, 0
-
-	br i1 %_98, label %if_then_1, label %if_else_1 
+	br i1 %_63, label %if_then_1, label %if_else_1 
 	if_else_1: 
-	%_99 = getelementptr i8, i8* %this, i32 12
-	%_100 = bitcast i8* %_99 to i32* 
-	%_101 = load i32, i32* %_100
-	call void (i32) @print_int(i32 %_101)
+	%_64 = getelementptr i8, i8* %this, i32 12
+	%_65 = bitcast i8* %_64 to i32* 
+	%_66 = load i32, i32* %_65
+	call void (i32) @print_int(i32 %_66)
 
-	%_102 = getelementptr i8, i8* %this, i32 12
-	%_103 = bitcast i8* %_102 to i32* 
-	store i32 0,i32* %_103
+	%_67 = getelementptr i8, i8* %this, i32 12
+	%_68 = bitcast i8* %_67 to i32* 
+	store i32 0,i32* %_68
 
-	%_117 = bitcast i8* %this to i8*** 
-	%_118 = load i8**, i8*** %_117 
-	%_119 = getelementptr i8*, i8** %_118, i32 1 
-	%_120 = load i8*, i8** %_119 
-	%_121 = bitcast i8* %_120 to i32 (i8* )* 
-	%_122 = call i32 %_121( i8* %this) 
+	%_72 = bitcast i8* %this to i8*** 
+	%_73 = load i8**, i8*** %_72 
+	%_74 = getelementptr i8*, i8** %_73, i32 1 
+	%_75 = load i8*, i8** %_74 
+	%_76 = bitcast i8* %_75 to i32 (i8* )* 
+	%_77 = call i32 %_76( i8* %this) 
 
-	store i32 %_122,i32* %j
+	store i32 %_77,i32* %j
 
 	br label %if_end_1
 	if_then_1: 
-	%_123 = getelementptr i8, i8* %this, i32 12
-	%_124 = bitcast i8* %_123 to i32* 
-	store i32 0,i32* %_124
+	%_78 = getelementptr i8, i8* %this, i32 12
+	%_79 = bitcast i8* %_78 to i32* 
+	store i32 0,i32* %_79
 
 	br label %if_end_1
 	if_end_1: 
 
-	%_130 = getelementptr i8, i8* %this, i32 12
-	%_131 = bitcast i8* %_130 to i32* 
-	%_132 = load i32, i32* %_131
-	ret i32 %_132
+	%_80 = getelementptr i8, i8* %this, i32 12
+	%_81 = bitcast i8* %_80 to i32* 
+	%_82 = load i32, i32* %_81
+	ret i32 %_82
 }
  

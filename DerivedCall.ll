@@ -40,38 +40,35 @@ define void @throw_nsz() {
  
 define i32 @main() {
 	%i = alloca i32
-
 	%b = alloca i8*
-
 	%f = alloca i8*
+	%_0 = call i8* @calloc(i32 1, i32 8)
+	%_1 = bitcast i8* %_0 to i8*** 
+	%_2 = getelementptr [1 x i8*], [1 x i8*]* @.F_vtable, i32 0, i32 0 
+	store i8** %_2, i8*** %_1
 
-	%_5 = call i8* @calloc(i32 1, i32 8)
-	%_6 = bitcast i8* %_5 to i8*** 
-	%_7 = getelementptr [1 x i8*], [1 x i8*]* @.F_vtable, i32 0, i32 0 
-	store i8** %_7, i8*** %_6
+	store i8* %_0,i8** %f
 
-	store i8* %_5,i8** %f
+	%_3 = call i8* @calloc(i32 1, i32 16)
+	%_4 = bitcast i8* %_3 to i8*** 
+	%_5 = getelementptr [0 x i8*], [0 x i8*]* @.B_vtable, i32 0, i32 0 
+	store i8** %_5, i8*** %_4
 
-	%_13 = call i8* @calloc(i32 1, i32 16)
-	%_14 = bitcast i8* %_13 to i8*** 
-	%_15 = getelementptr [0 x i8*], [0 x i8*]* @.B_vtable, i32 0, i32 0 
-	store i8** %_15, i8*** %_14
+	store i8* %_3,i8** %b
 
-	store i8* %_13,i8** %b
+	%_6 = load i8*, i8** %f
+	%_10 = bitcast i8* %_6 to i8*** 
+	%_11 = load i8**, i8*** %_10 
+	%_12 = getelementptr i8*, i8** %_11, i32 0 
+	%_13 = load i8*, i8** %_12 
+	%_14 = bitcast i8* %_13 to i32 (i8* , i8*)* 
+	%_15 = load i8*, i8** %b
+	%_16 = call i32 %_14( i8* %_6, i8* %_15) 
 
-	%_21 = load i8*, i8** %f
-	%_25 = bitcast i8* %_21 to i8*** 
-	%_26 = load i8**, i8*** %_25 
-	%_27 = getelementptr i8*, i8** %_26, i32 0 
-	%_28 = load i8*, i8** %_27 
-	%_29 = bitcast i8* %_28 to i32 (i8* , i8*)* 
-	%_30 = load i8*, i8** %b
-	%_31 = call i32 %_29( i8* %_21, i8* %_30) 
+	store i32 %_16,i32* %i
 
-	store i32 %_31,i32* %i
-
-	%_32 = load i32, i32* %i
-	call void (i32) @print_int(i32 %_32)
+	%_17 = load i32, i32* %i
+	call void (i32) @print_int(i32 %_17)
 
 	ret i32 0
 }

@@ -56,21 +56,21 @@ define i32 @Operator.compute(i8* %this) {
 	%_13 = bitcast i8* %_12 to i32* 
 	store i32 10,i32* %_13
 
-	%_19 = getelementptr i8, i8* %this, i32 14
-	%_20 = bitcast i8* %_19 to i32* 
-	store i32 20,i32* %_20
+	%_14 = getelementptr i8, i8* %this, i32 14
+	%_15 = bitcast i8* %_14 to i32* 
+	store i32 20,i32* %_15
 
-	%_26 = getelementptr i8, i8* %this, i32 18
-	%_27 = bitcast i8* %_26 to i1* 
-	%_33 = getelementptr i8, i8* %this, i32 10
-	%_34 = bitcast i8* %_33 to i32* 
-	%_35 = load i32, i32* %_34
-	%_36 = getelementptr i8, i8* %this, i32 14
-	%_37 = bitcast i8* %_36 to i32* 
-	%_38 = load i32, i32* %_37
-	%_39 = icmp slt i32 %_35, %_38
+	%_16 = getelementptr i8, i8* %this, i32 18
+	%_17 = bitcast i8* %_16 to i1* 
+	%_18 = getelementptr i8, i8* %this, i32 10
+	%_19 = bitcast i8* %_18 to i32* 
+	%_20 = load i32, i32* %_19
+	%_21 = getelementptr i8, i8* %this, i32 14
+	%_22 = bitcast i8* %_21 to i32* 
+	%_23 = load i32, i32* %_22
+	%_24 = icmp slt i32 %_20, %_23
 
-	store i1 %_39,i1* %_27
+	store i1 %_24,i1* %_17
 
 	ret i32 0
 }

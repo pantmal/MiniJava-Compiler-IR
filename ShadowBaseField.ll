@@ -39,59 +39,58 @@ define void @throw_nsz() {
  
 define i32 @main() {
 	%a = alloca i8*
+	%_0 = call i8* @calloc(i32 1, i32 12)
+	%_1 = bitcast i8* %_0 to i8*** 
+	%_2 = getelementptr [1 x i8*], [1 x i8*]* @.A_vtable, i32 0, i32 0 
+	store i8** %_2, i8*** %_1
 
-	%_5 = call i8* @calloc(i32 1, i32 12)
-	%_6 = bitcast i8* %_5 to i8*** 
-	%_7 = getelementptr [1 x i8*], [1 x i8*]* @.A_vtable, i32 0, i32 0 
-	store i8** %_7, i8*** %_6
+	store i8* %_0,i8** %a
 
-	store i8* %_5,i8** %a
+	%_3 = load i8*, i8** %a
+	%_7 = bitcast i8* %_3 to i8*** 
+	%_8 = load i8**, i8*** %_7 
+	%_9 = getelementptr i8*, i8** %_8, i32 0 
+	%_10 = load i8*, i8** %_9 
+	%_11 = bitcast i8* %_10 to i32 (i8* )* 
+	%_12 = call i32 %_11( i8* %_3) 
 
-	%_8 = load i8*, i8** %a
-	%_12 = bitcast i8* %_8 to i8*** 
-	%_13 = load i8**, i8*** %_12 
-	%_14 = getelementptr i8*, i8** %_13, i32 0 
-	%_15 = load i8*, i8** %_14 
-	%_16 = bitcast i8* %_15 to i32 (i8* )* 
-	%_17 = call i32 %_16( i8* %_8) 
+	call void (i32) @print_int(i32 %_12)
 
-	call void (i32) @print_int(i32 %_17)
+	%_13 = call i8* @calloc(i32 1, i32 16)
+	%_14 = bitcast i8* %_13 to i8*** 
+	%_15 = getelementptr [1 x i8*], [1 x i8*]* @.B_vtable, i32 0, i32 0 
+	store i8** %_15, i8*** %_14
 
-	%_23 = call i8* @calloc(i32 1, i32 16)
-	%_24 = bitcast i8* %_23 to i8*** 
-	%_25 = getelementptr [1 x i8*], [1 x i8*]* @.B_vtable, i32 0, i32 0 
-	store i8** %_25, i8*** %_24
+	store i8* %_13,i8** %a
 
-	store i8* %_23,i8** %a
+	%_16 = load i8*, i8** %a
+	%_20 = bitcast i8* %_16 to i8*** 
+	%_21 = load i8**, i8*** %_20 
+	%_22 = getelementptr i8*, i8** %_21, i32 0 
+	%_23 = load i8*, i8** %_22 
+	%_24 = bitcast i8* %_23 to i32 (i8* )* 
+	%_25 = call i32 %_24( i8* %_16) 
 
-	%_26 = load i8*, i8** %a
-	%_30 = bitcast i8* %_26 to i8*** 
-	%_31 = load i8**, i8*** %_30 
-	%_32 = getelementptr i8*, i8** %_31, i32 0 
-	%_33 = load i8*, i8** %_32 
-	%_34 = bitcast i8* %_33 to i32 (i8* )* 
-	%_35 = call i32 %_34( i8* %_26) 
-
-	call void (i32) @print_int(i32 %_35)
+	call void (i32) @print_int(i32 %_25)
 
 	ret i32 0
 }
  
 define i32 @A.getX(i8* %this) {
-	%_36 = getelementptr i8, i8* %this, i32 8
-	%_37 = bitcast i8* %_36 to i32* 
-	%_38 = load i32, i32* %_37
-	ret i32 %_38
+	%_26 = getelementptr i8, i8* %this, i32 8
+	%_27 = bitcast i8* %_26 to i32* 
+	%_28 = load i32, i32* %_27
+	ret i32 %_28
 }
  
 define i32 @B.getX(i8* %this) {
-	%_39 = getelementptr i8, i8* %this, i32 12
-	%_40 = bitcast i8* %_39 to i32* 
-	store i32 1,i32* %_40
+	%_29 = getelementptr i8, i8* %this, i32 12
+	%_30 = bitcast i8* %_29 to i32* 
+	store i32 1,i32* %_30
 
-	%_46 = getelementptr i8, i8* %this, i32 12
-	%_47 = bitcast i8* %_46 to i32* 
-	%_48 = load i32, i32* %_47
-	ret i32 %_48
+	%_31 = getelementptr i8, i8* %this, i32 12
+	%_32 = bitcast i8* %_31 to i32* 
+	%_33 = load i32, i32* %_32
+	ret i32 %_33
 }
  

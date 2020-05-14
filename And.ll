@@ -31,28 +31,25 @@ define void @throw_nsz() {
  
 define i32 @main() {
 	%b = alloca i1
-
 	%c = alloca i1
-
 	%x = alloca i32
-
 	store i1 0,i1* %b
 
 	store i1 1,i1* %c
 
-	%_10 = load i1, i1* %b
-	br i1 %_10, label %and_clause2, label %and_clause1 
+	%_0 = load i1, i1* %b
+	br i1 %_0, label %and_clause2, label %and_clause1 
 	and_clause1: 
 	br label %and_clause3
 	and_clause2: 
-	%_11 = load i1, i1* %c
+	%_1 = load i1, i1* %c
 	br label %and_clause3
 	and_clause3: 
 	br label %and_clause4
 	and_clause4: 
-	%_12 = phi i1 [ 0, %and_clause1 ], [ %_11, %and_clause3] 
+	%_2 = phi i1 [ 0, %and_clause1 ], [ %_1, %and_clause3] 
 
-	br i1 %_12, label %if_then_0, label %if_else_0 
+	br i1 %_2, label %if_then_0, label %if_else_0 
 	if_else_0: 
 	store i32 1,i32* %x
 
@@ -63,8 +60,8 @@ define i32 @main() {
 	br label %if_end_0
 	if_end_0: 
 
-	%_23 = load i32, i32* %x
-	call void (i32) @print_int(i32 %_23)
+	%_3 = load i32, i32* %x
+	call void (i32) @print_int(i32 %_3)
 
 	ret i32 0
 }

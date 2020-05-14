@@ -6,17 +6,17 @@ import java.io.IOException;  // Import the IOException class to handle errors
 
 
 //Offset Table will create the offsets of a semantically correct Minijava program.
-public class OffsetCreator {
+public class OffsetTable {
 
     public SymbolTable visitor_sym;
 
     //The constructor gets the SymbolTable object. 
-    public OffsetCreator(SymbolTable st){
+    public OffsetTable(SymbolTable st){
         this.visitor_sym = st;   
     }
 
     //OutputCreator function creates our output.
-    public void OutputCreator(){
+    public void OffsetCreator(){
 
         //For every class in the classId table
         for (String id : visitor_sym.classId_table.keySet()) {
@@ -31,10 +31,10 @@ public class OffsetCreator {
                 }
             }
 
-            System.out.println("-------Class "+id+"-------" );
+            //System.out.println("-------Class "+id+"-------" );
 
             //Getting the field offsets.
-            System.out.println("--Variables--" );
+            //System.out.println("--Variables--" );
             if(temp.field_table!=null){
 
 
@@ -55,7 +55,7 @@ public class OffsetCreator {
                     //If it's the first field print 0, except if we're in a hierarchy. If so, get the offset sum of the previous mother class.
                     if (counter == 0){
                         if(temp.mother == null){
-                            System.out.println(id+"."+f_id+" : 0" );
+                            //System.out.println(id+"."+f_id+" : 0" );
                             temp.ot_insert(f_id,8);
                         }else{
                             
@@ -79,7 +79,7 @@ public class OffsetCreator {
                                 temp.ot_insert(f_id,last_count+8);
                             }
                             
-                            System.out.println(id+"."+f_id+" : "+last_count );
+                            //System.out.println(id+"."+f_id+" : "+last_count );
 
                             //Used for the next child classes.
                             ot_sum = last_count;
@@ -121,7 +121,7 @@ public class OffsetCreator {
 
                         }
 
-                        System.out.println(id+"."+f_id+" : "+sum );
+                        //System.out.println(id+"."+f_id+" : "+sum );
 
                         ot_sum = sum;
 
@@ -165,7 +165,7 @@ public class OffsetCreator {
             }
 
             //Moving on to the method offsets.
-            System.out.println("--Methods--" );
+            //System.out.println("--Methods--" );
             if(temp.methodId_table!=null){
                 
                 int counter = 0; //Counter of which methodId we're on.
@@ -187,7 +187,7 @@ public class OffsetCreator {
                     if (counter == 0){
                         
                         if(temp.mother == null){
-                            System.out.println(id+"."+m_id+" : 0" );
+                            //System.out.println(id+"."+m_id+" : 0" );
                             temp.vt_insert(m_id,v_count);
                             v_count++;
 
@@ -206,7 +206,7 @@ public class OffsetCreator {
                                 last_count = last_count + 8;
                             }
 
-                            System.out.println(id+"."+m_id+" : "+last_count );
+                            //System.out.println(id+"."+m_id+" : "+last_count );
                             temp.vt_insert(m_id,v_count);
                             v_count++;
 
@@ -237,7 +237,7 @@ public class OffsetCreator {
 
                         }
 
-                        System.out.println(id+"."+m_id+" : "+sum );
+                        //System.out.println(id+"."+m_id+" : "+sum );
 
                         mt_sum = sum;
 

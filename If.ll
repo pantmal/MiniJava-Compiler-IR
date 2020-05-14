@@ -31,13 +31,12 @@ define void @throw_nsz() {
  
 define i32 @main() {
 	%x = alloca i32
-
 	store i32 10,i32* %x
 
-	%_5 = load i32, i32* %x
-	%_6 = icmp slt i32 %_5, 2
+	%_0 = load i32, i32* %x
+	%_1 = icmp slt i32 %_0, 2
 
-	br i1 %_6, label %if_then_0, label %if_else_0 
+	br i1 %_1, label %if_then_0, label %if_else_0 
 	if_else_0: 
 	call void (i32) @print_int(i32 1)
 

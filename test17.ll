@@ -55,81 +55,79 @@ define i32 @main() {
  
 define i32 @Test.start(i8* %this) {
 	%test = alloca i8*
+	%_12 = call i8* @calloc(i32 1, i32 12)
+	%_13 = bitcast i8* %_12 to i8*** 
+	%_14 = getelementptr [3 x i8*], [3 x i8*]* @.Test_vtable, i32 0, i32 0 
+	store i8** %_14, i8*** %_13
 
-	%_17 = call i8* @calloc(i32 1, i32 12)
-	%_18 = bitcast i8* %_17 to i8*** 
-	%_19 = getelementptr [3 x i8*], [3 x i8*]* @.Test_vtable, i32 0, i32 0 
-	store i8** %_19, i8*** %_18
+	store i8* %_12,i8** %test
 
-	store i8* %_17,i8** %test
+	%_15 = getelementptr i8, i8* %this, i32 8
+	%_16 = bitcast i8* %_15 to i32* 
+	store i32 10,i32* %_16
 
-	%_20 = getelementptr i8, i8* %this, i32 8
-	%_21 = bitcast i8* %_20 to i32* 
-	store i32 10,i32* %_21
+	%_17 = getelementptr i8, i8* %this, i32 8
+	%_18 = bitcast i8* %_17 to i32* 
+	%_19 = getelementptr i8, i8* %this, i32 8
+	%_20 = bitcast i8* %_19 to i32* 
+	%_21 = load i32, i32* %_20
+	%_22 = load i8*, i8** %test
+	%_26 = bitcast i8* %_22 to i8*** 
+	%_27 = load i8**, i8*** %_26 
+	%_28 = getelementptr i8*, i8** %_27, i32 1 
+	%_29 = load i8*, i8** %_28 
+	%_30 = bitcast i8* %_29 to i8* (i8* , i8*)* 
+	%_31 = call i8* %_30( i8* %_22, i8* %this) 
 
-	%_27 = getelementptr i8, i8* %this, i32 8
-	%_28 = bitcast i8* %_27 to i32* 
-	%_34 = getelementptr i8, i8* %this, i32 8
-	%_35 = bitcast i8* %_34 to i32* 
-	%_36 = load i32, i32* %_35
-	%_37 = load i8*, i8** %test
-	%_41 = bitcast i8* %_37 to i8*** 
-	%_42 = load i8**, i8*** %_41 
-	%_43 = getelementptr i8*, i8** %_42, i32 1 
-	%_44 = load i8*, i8** %_43 
-	%_45 = bitcast i8* %_44 to i8* (i8* , i8*)* 
-	%_46 = call i8* %_45( i8* %_37, i8* %this) 
+	%_32 = load i8*, i8** %test
+	%_36 = bitcast i8* %_32 to i8*** 
+	%_37 = load i8**, i8*** %_36 
+	%_38 = getelementptr i8*, i8** %_37, i32 1 
+	%_39 = load i8*, i8** %_38 
+	%_40 = bitcast i8* %_39 to i8* (i8* , i8*)* 
+	%_41 = call i8* %_40( i8* %_32, i8* %this) 
 
-	%_47 = load i8*, i8** %test
-	%_51 = bitcast i8* %_47 to i8*** 
-	%_52 = load i8**, i8*** %_51 
-	%_53 = getelementptr i8*, i8** %_52, i32 1 
-	%_54 = load i8*, i8** %_53 
-	%_55 = bitcast i8* %_54 to i8* (i8* , i8*)* 
-	%_56 = call i8* %_55( i8* %_47, i8* %this) 
+	%_45 = bitcast i8* %_41 to i8*** 
+	%_46 = load i8**, i8*** %_45 
+	%_47 = getelementptr i8*, i8** %_46, i32 2 
+	%_48 = load i8*, i8** %_47 
+	%_49 = bitcast i8* %_48 to i32 (i8* )* 
+	%_50 = call i32 %_49( i8* %_41) 
 
-	%_60 = bitcast i8* %_56 to i8*** 
-	%_61 = load i8**, i8*** %_60 
-	%_62 = getelementptr i8*, i8** %_61, i32 2 
-	%_63 = load i8*, i8** %_62 
-	%_64 = bitcast i8* %_63 to i32 (i8* )* 
-	%_65 = call i32 %_64( i8* %_56) 
+	%_51 = add i32 %_21, %_50
 
-	%_66 = add i32 %_36, %_65
+	store i32 %_51,i32* %_18
 
-	store i32 %_66,i32* %_28
-
-	%_67 = getelementptr i8, i8* %this, i32 8
-	%_68 = bitcast i8* %_67 to i32* 
-	%_69 = load i32, i32* %_68
-	ret i32 %_69
+	%_52 = getelementptr i8, i8* %this, i32 8
+	%_53 = bitcast i8* %_52 to i32* 
+	%_54 = load i32, i32* %_53
+	ret i32 %_54
 }
  
 define i8* @Test.first(i8* %this, i8* %.test2) {
 	%test2 = alloca i8*
 	store i8* %.test2, i8** %test2
 	%test3 = alloca i8*
+	%_55 = load i8*, i8** %test2
+	store i8* %_55,i8** %test3
 
-	%_75 = load i8*, i8** %test2
-	store i8* %_75,i8** %test3
-
-	%_76 = load i8*, i8** %test3
-	ret i8* %_76
+	%_56 = load i8*, i8** %test3
+	ret i8* %_56
 }
  
 define i32 @Test.second(i8* %this) {
-	%_77 = getelementptr i8, i8* %this, i32 8
-	%_78 = bitcast i8* %_77 to i32* 
-	%_84 = getelementptr i8, i8* %this, i32 8
-	%_85 = bitcast i8* %_84 to i32* 
-	%_86 = load i32, i32* %_85
-	%_87 = add i32 %_86, 10
+	%_57 = getelementptr i8, i8* %this, i32 8
+	%_58 = bitcast i8* %_57 to i32* 
+	%_59 = getelementptr i8, i8* %this, i32 8
+	%_60 = bitcast i8* %_59 to i32* 
+	%_61 = load i32, i32* %_60
+	%_62 = add i32 %_61, 10
 
-	store i32 %_87,i32* %_78
+	store i32 %_62,i32* %_58
 
-	%_88 = getelementptr i8, i8* %this, i32 8
-	%_89 = bitcast i8* %_88 to i32* 
-	%_90 = load i32, i32* %_89
-	ret i32 %_90
+	%_63 = getelementptr i8, i8* %this, i32 8
+	%_64 = bitcast i8* %_63 to i32* 
+	%_65 = load i32, i32* %_64
+	ret i32 %_65
 }
  

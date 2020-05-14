@@ -82,120 +82,116 @@ define i1 @Element.Init(i8* %this, i32 %.v_Age, i32 %.v_Salary, i1 %.v_Married) 
 	store i1 %.v_Married, i1* %v_Married
 	%_12 = getelementptr i8, i8* %this, i32 8
 	%_13 = bitcast i8* %_12 to i32* 
-	%_19 = load i32, i32* %v_Age
-	store i32 %_19,i32* %_13
+	%_14 = load i32, i32* %v_Age
+	store i32 %_14,i32* %_13
 
-	%_20 = getelementptr i8, i8* %this, i32 12
-	%_21 = bitcast i8* %_20 to i32* 
-	%_27 = load i32, i32* %v_Salary
-	store i32 %_27,i32* %_21
+	%_15 = getelementptr i8, i8* %this, i32 12
+	%_16 = bitcast i8* %_15 to i32* 
+	%_17 = load i32, i32* %v_Salary
+	store i32 %_17,i32* %_16
 
-	%_28 = getelementptr i8, i8* %this, i32 16
-	%_29 = bitcast i8* %_28 to i1* 
-	%_35 = load i1, i1* %v_Married
-	store i1 %_35,i1* %_29
+	%_18 = getelementptr i8, i8* %this, i32 16
+	%_19 = bitcast i8* %_18 to i1* 
+	%_20 = load i1, i1* %v_Married
+	store i1 %_20,i1* %_19
 
 	ret i1 1
 }
  
 define i32 @Element.GetAge(i8* %this) {
-	%_36 = getelementptr i8, i8* %this, i32 8
-	%_37 = bitcast i8* %_36 to i32* 
-	%_38 = load i32, i32* %_37
-	ret i32 %_38
+	%_21 = getelementptr i8, i8* %this, i32 8
+	%_22 = bitcast i8* %_21 to i32* 
+	%_23 = load i32, i32* %_22
+	ret i32 %_23
 }
  
 define i32 @Element.GetSalary(i8* %this) {
-	%_39 = getelementptr i8, i8* %this, i32 12
-	%_40 = bitcast i8* %_39 to i32* 
-	%_41 = load i32, i32* %_40
-	ret i32 %_41
+	%_24 = getelementptr i8, i8* %this, i32 12
+	%_25 = bitcast i8* %_24 to i32* 
+	%_26 = load i32, i32* %_25
+	ret i32 %_26
 }
  
 define i1 @Element.GetMarried(i8* %this) {
-	%_42 = getelementptr i8, i8* %this, i32 16
-	%_43 = bitcast i8* %_42 to i1* 
-	%_44 = load i1, i1* %_43
-	ret i1 %_44
+	%_27 = getelementptr i8, i8* %this, i32 16
+	%_28 = bitcast i8* %_27 to i1* 
+	%_29 = load i1, i1* %_28
+	ret i1 %_29
 }
  
 define i1 @Element.Equal(i8* %this, i8* %.other) {
 	%other = alloca i8*
 	store i8* %.other, i8** %other
 	%ret_val = alloca i1
-
 	%aux01 = alloca i32
-
 	%aux02 = alloca i32
-
 	%nt = alloca i32
-
 	store i1 1,i1* %ret_val
 
-	%_55 = load i8*, i8** %other
-	%_59 = bitcast i8* %_55 to i8*** 
-	%_60 = load i8**, i8*** %_59 
-	%_61 = getelementptr i8*, i8** %_60, i32 1 
-	%_62 = load i8*, i8** %_61 
-	%_63 = bitcast i8* %_62 to i32 (i8* )* 
-	%_64 = call i32 %_63( i8* %_55) 
+	%_30 = load i8*, i8** %other
+	%_34 = bitcast i8* %_30 to i8*** 
+	%_35 = load i8**, i8*** %_34 
+	%_36 = getelementptr i8*, i8** %_35, i32 1 
+	%_37 = load i8*, i8** %_36 
+	%_38 = bitcast i8* %_37 to i32 (i8* )* 
+	%_39 = call i32 %_38( i8* %_30) 
 
-	store i32 %_64,i32* %aux01
+	store i32 %_39,i32* %aux01
 
-	%_68 = bitcast i8* %this to i8*** 
-	%_69 = load i8**, i8*** %_68 
-	%_70 = getelementptr i8*, i8** %_69, i32 5 
-	%_71 = load i8*, i8** %_70 
-	%_72 = bitcast i8* %_71 to i1 (i8* , i32, i32)* 
-	%_73 = load i32, i32* %aux01
-	%_74 = getelementptr i8, i8* %this, i32 8
-	%_75 = bitcast i8* %_74 to i32* 
-	%_76 = load i32, i32* %_75
-	%_77 = call i1 %_72( i8* %this, i32 %_73, i32 %_76) 
+	%_43 = bitcast i8* %this to i8*** 
+	%_44 = load i8**, i8*** %_43 
+	%_45 = getelementptr i8*, i8** %_44, i32 5 
+	%_46 = load i8*, i8** %_45 
+	%_47 = bitcast i8* %_46 to i1 (i8* , i32, i32)* 
+	%_48 = load i32, i32* %aux01
+	%_49 = getelementptr i8, i8* %this, i32 8
+	%_50 = bitcast i8* %_49 to i32* 
+	%_51 = load i32, i32* %_50
+	%_52 = call i1 %_47( i8* %this, i32 %_48, i32 %_51) 
 
-%_78 = xor i1 1, %_77
+	%_53 = xor i1 1, %_52
 
-	br i1 %_78, label %if_then_0, label %if_else_0 
+	br i1 %_53, label %if_then_0, label %if_else_0 
 	if_else_0: 
-	%_84 = load i8*, i8** %other
-	%_88 = bitcast i8* %_84 to i8*** 
-	%_89 = load i8**, i8*** %_88 
-	%_90 = getelementptr i8*, i8** %_89, i32 2 
-	%_91 = load i8*, i8** %_90 
-	%_92 = bitcast i8* %_91 to i32 (i8* )* 
-	%_93 = call i32 %_92( i8* %_84) 
+	%_54 = load i8*, i8** %other
+	%_58 = bitcast i8* %_54 to i8*** 
+	%_59 = load i8**, i8*** %_58 
+	%_60 = getelementptr i8*, i8** %_59, i32 2 
+	%_61 = load i8*, i8** %_60 
+	%_62 = bitcast i8* %_61 to i32 (i8* )* 
+	%_63 = call i32 %_62( i8* %_54) 
 
-	store i32 %_93,i32* %aux02
+	store i32 %_63,i32* %aux02
 
-	%_97 = bitcast i8* %this to i8*** 
-	%_98 = load i8**, i8*** %_97 
-	%_99 = getelementptr i8*, i8** %_98, i32 5 
-	%_100 = load i8*, i8** %_99 
-	%_101 = bitcast i8* %_100 to i1 (i8* , i32, i32)* 
-	%_102 = load i32, i32* %aux02
-	%_103 = getelementptr i8, i8* %this, i32 12
-	%_104 = bitcast i8* %_103 to i32* 
-	%_105 = load i32, i32* %_104
-	%_106 = call i1 %_101( i8* %this, i32 %_102, i32 %_105) 
+	%_67 = bitcast i8* %this to i8*** 
+	%_68 = load i8**, i8*** %_67 
+	%_69 = getelementptr i8*, i8** %_68, i32 5 
+	%_70 = load i8*, i8** %_69 
+	%_71 = bitcast i8* %_70 to i1 (i8* , i32, i32)* 
+	%_72 = load i32, i32* %aux02
+	%_73 = getelementptr i8, i8* %this, i32 12
+	%_74 = bitcast i8* %_73 to i32* 
+	%_75 = load i32, i32* %_74
+	%_76 = call i1 %_71( i8* %this, i32 %_72, i32 %_75) 
 
-%_107 = xor i1 1, %_106
+	%_77 = xor i1 1, %_76
 
-	br i1 %_107, label %if_then_1, label %if_else_1 
+	br i1 %_77, label %if_then_1, label %if_else_1 
 	if_else_1: 
-	%_108 = getelementptr i8, i8* %this, i32 16
-	%_109 = bitcast i8* %_108 to i1* 
-	%_110 = load i1, i1* %_109
-	br i1 %_110, label %if_then_2, label %if_else_2 
+	%_78 = getelementptr i8, i8* %this, i32 16
+	%_79 = bitcast i8* %_78 to i1* 
+	%_80 = load i1, i1* %_79
+	br i1 %_80, label %if_then_2, label %if_else_2 
 	if_else_2: 
-	%_111 = load i8*, i8** %other
-	%_115 = bitcast i8* %_111 to i8*** 
-	%_116 = load i8**, i8*** %_115 
-	%_117 = getelementptr i8*, i8** %_116, i32 3 
-	%_118 = load i8*, i8** %_117 
-	%_119 = bitcast i8* %_118 to i1 (i8* )* 
-	%_120 = call i1 %_119( i8* %_111) 
+	%_81 = load i8*, i8** %other
+	%_85 = bitcast i8* %_81 to i8*** 
+	%_86 = load i8**, i8*** %_85 
+	%_87 = getelementptr i8*, i8** %_86, i32 3 
+	%_88 = load i8*, i8** %_87 
+	%_89 = bitcast i8* %_88 to i1 (i8* )* 
+	%_90 = call i1 %_89( i8* %_81) 
 
-	br i1 %_120, label %if_then_3, label %if_else_3 
+	br i1 %_90, label %if_then_3, label %if_else_3 
 	if_else_3: 
 	store i32 0,i32* %nt
 
@@ -208,17 +204,17 @@ define i1 @Element.Equal(i8* %this, i8* %.other) {
 
 	br label %if_end_2
 	if_then_2: 
-	%_131 = load i8*, i8** %other
-	%_135 = bitcast i8* %_131 to i8*** 
-	%_136 = load i8**, i8*** %_135 
-	%_137 = getelementptr i8*, i8** %_136, i32 3 
-	%_138 = load i8*, i8** %_137 
-	%_139 = bitcast i8* %_138 to i1 (i8* )* 
-	%_140 = call i1 %_139( i8* %_131) 
+	%_91 = load i8*, i8** %other
+	%_95 = bitcast i8* %_91 to i8*** 
+	%_96 = load i8**, i8*** %_95 
+	%_97 = getelementptr i8*, i8** %_96, i32 3 
+	%_98 = load i8*, i8** %_97 
+	%_99 = bitcast i8* %_98 to i1 (i8* )* 
+	%_100 = call i1 %_99( i8* %_91) 
 
-%_141 = xor i1 1, %_140
+	%_101 = xor i1 1, %_100
 
-	br i1 %_141, label %if_then_4, label %if_else_4 
+	br i1 %_101, label %if_then_4, label %if_else_4 
 	if_else_4: 
 	store i32 0,i32* %nt
 
@@ -246,8 +242,8 @@ define i1 @Element.Equal(i8* %this, i8* %.other) {
 	br label %if_end_0
 	if_end_0: 
 
-	%_162 = load i1, i1* %ret_val
-	ret i1 %_162
+	%_102 = load i1, i1* %ret_val
+	ret i1 %_102
 }
  
 define i1 @Element.Compare(i8* %this, i32 %.num1, i32 %.num2) {
@@ -256,29 +252,27 @@ define i1 @Element.Compare(i8* %this, i32 %.num1, i32 %.num2) {
 	%num2 = alloca i32
 	store i32 %.num2, i32* %num2
 	%retval = alloca i1
-
 	%aux02 = alloca i32
-
 	store i1 0,i1* %retval
 
-	%_173 = load i32, i32* %num2
-	%_174 = add i32 %_173, 1
+	%_103 = load i32, i32* %num2
+	%_104 = add i32 %_103, 1
 
-	store i32 %_174,i32* %aux02
+	store i32 %_104,i32* %aux02
 
-	%_175 = load i32, i32* %num1
-	%_176 = load i32, i32* %num2
-	%_177 = icmp slt i32 %_175, %_176
+	%_105 = load i32, i32* %num1
+	%_106 = load i32, i32* %num2
+	%_107 = icmp slt i32 %_105, %_106
 
-	br i1 %_177, label %if_then_5, label %if_else_5 
+	br i1 %_107, label %if_then_5, label %if_else_5 
 	if_else_5: 
-	%_178 = load i32, i32* %num1
-	%_179 = load i32, i32* %aux02
-	%_180 = icmp slt i32 %_178, %_179
+	%_108 = load i32, i32* %num1
+	%_109 = load i32, i32* %aux02
+	%_110 = icmp slt i32 %_108, %_109
 
-%_181 = xor i1 1, %_180
+	%_111 = xor i1 1, %_110
 
-	br i1 %_181, label %if_then_6, label %if_else_6 
+	br i1 %_111, label %if_then_6, label %if_else_6 
 	if_else_6: 
 	store i1 1,i1* %retval
 
@@ -296,14 +290,14 @@ define i1 @Element.Compare(i8* %this, i32 %.num1, i32 %.num2) {
 	br label %if_end_5
 	if_end_5: 
 
-	%_197 = load i1, i1* %retval
-	ret i1 %_197
+	%_112 = load i1, i1* %retval
+	ret i1 %_112
 }
  
 define i1 @List.Init(i8* %this) {
-	%_198 = getelementptr i8, i8* %this, i32 24
-	%_199 = bitcast i8* %_198 to i1* 
-	store i1 1,i1* %_199
+	%_113 = getelementptr i8, i8* %this, i32 24
+	%_114 = bitcast i8* %_113 to i1* 
+	store i1 1,i1* %_114
 
 	ret i1 1
 }
@@ -315,20 +309,20 @@ define i1 @List.InitNew(i8* %this, i8* %.v_elem, i8* %.v_next, i1 %.v_end) {
 	store i8* %.v_next, i8** %v_next
 	%v_end = alloca i1
 	store i1 %.v_end, i1* %v_end
-	%_205 = getelementptr i8, i8* %this, i32 24
-	%_206 = bitcast i8* %_205 to i1* 
-	%_212 = load i1, i1* %v_end
-	store i1 %_212,i1* %_206
+	%_115 = getelementptr i8, i8* %this, i32 24
+	%_116 = bitcast i8* %_115 to i1* 
+	%_117 = load i1, i1* %v_end
+	store i1 %_117,i1* %_116
 
-	%_213 = getelementptr i8, i8* %this, i32 8
-	%_214 = bitcast i8* %_213 to i8** 
-	%_220 = load i8*, i8** %v_elem
-	store i8* %_220,i8** %_214
+	%_118 = getelementptr i8, i8* %this, i32 8
+	%_119 = bitcast i8* %_118 to i8** 
+	%_120 = load i8*, i8** %v_elem
+	store i8* %_120,i8** %_119
 
-	%_221 = getelementptr i8, i8* %this, i32 16
-	%_222 = bitcast i8* %_221 to i8** 
-	%_228 = load i8*, i8** %v_next
-	store i8* %_228,i8** %_222
+	%_121 = getelementptr i8, i8* %this, i32 16
+	%_122 = bitcast i8* %_121 to i8** 
+	%_123 = load i8*, i8** %v_next
+	store i8* %_123,i8** %_122
 
 	ret i1 1
 }
@@ -337,43 +331,40 @@ define i8* @List.Insert(i8* %this, i8* %.new_elem) {
 	%new_elem = alloca i8*
 	store i8* %.new_elem, i8** %new_elem
 	%ret_val = alloca i1
-
 	%aux03 = alloca i8*
-
 	%aux02 = alloca i8*
-
 	store i8* %this,i8** %aux03
 
-	%_239 = call i8* @calloc(i32 1, i32 25)
-	%_240 = bitcast i8* %_239 to i8*** 
-	%_241 = getelementptr [10 x i8*], [10 x i8*]* @.List_vtable, i32 0, i32 0 
-	store i8** %_241, i8*** %_240
+	%_124 = call i8* @calloc(i32 1, i32 25)
+	%_125 = bitcast i8* %_124 to i8*** 
+	%_126 = getelementptr [10 x i8*], [10 x i8*]* @.List_vtable, i32 0, i32 0 
+	store i8** %_126, i8*** %_125
 
-	store i8* %_239,i8** %aux02
+	store i8* %_124,i8** %aux02
 
-	%_247 = load i8*, i8** %aux02
-	%_251 = bitcast i8* %_247 to i8*** 
-	%_252 = load i8**, i8*** %_251 
-	%_253 = getelementptr i8*, i8** %_252, i32 1 
-	%_254 = load i8*, i8** %_253 
-	%_255 = bitcast i8* %_254 to i1 (i8* , i8*, i8*, i1)* 
-	%_256 = load i8*, i8** %new_elem
-	%_257 = load i8*, i8** %aux03
-	%_258 = call i1 %_255( i8* %_247, i8* %_256, i8* %_257, i1 0) 
+	%_127 = load i8*, i8** %aux02
+	%_131 = bitcast i8* %_127 to i8*** 
+	%_132 = load i8**, i8*** %_131 
+	%_133 = getelementptr i8*, i8** %_132, i32 1 
+	%_134 = load i8*, i8** %_133 
+	%_135 = bitcast i8* %_134 to i1 (i8* , i8*, i8*, i1)* 
+	%_136 = load i8*, i8** %new_elem
+	%_137 = load i8*, i8** %aux03
+	%_138 = call i1 %_135( i8* %_127, i8* %_136, i8* %_137, i1 0) 
 
-	store i1 %_258,i1* %ret_val
+	store i1 %_138,i1* %ret_val
 
-	%_259 = load i8*, i8** %aux02
-	ret i8* %_259
+	%_139 = load i8*, i8** %aux02
+	ret i8* %_139
 }
  
 define i1 @List.SetNext(i8* %this, i8* %.v_next) {
 	%v_next = alloca i8*
 	store i8* %.v_next, i8** %v_next
-	%_260 = getelementptr i8, i8* %this, i32 16
-	%_261 = bitcast i8* %_260 to i8** 
-	%_267 = load i8*, i8** %v_next
-	store i8* %_267,i8** %_261
+	%_140 = getelementptr i8, i8* %this, i32 16
+	%_141 = bitcast i8* %_140 to i8** 
+	%_142 = load i8*, i8** %v_next
+	store i8* %_142,i8** %_141
 
 	ret i1 1
 }
@@ -382,75 +373,66 @@ define i8* @List.Delete(i8* %this, i8* %.e) {
 	%e = alloca i8*
 	store i8* %.e, i8** %e
 	%my_head = alloca i8*
-
 	%ret_val = alloca i1
-
 	%aux05 = alloca i1
-
 	%aux01 = alloca i8*
-
 	%prev = alloca i8*
-
 	%var_end = alloca i1
-
 	%var_elem = alloca i8*
-
 	%aux04 = alloca i32
-
 	%nt = alloca i32
-
 	store i8* %this,i8** %my_head
 
 	store i1 0,i1* %ret_val
 
-	%_283 = sub i32 0, 1
+	%_143 = sub i32 0, 1
 
-	store i32 %_283,i32* %aux04
+	store i32 %_143,i32* %aux04
 
 	store i8* %this,i8** %aux01
 
 	store i8* %this,i8** %prev
 
-	%_299 = getelementptr i8, i8* %this, i32 24
-	%_300 = bitcast i8* %_299 to i1* 
-	%_301 = load i1, i1* %_300
-	store i1 %_301,i1* %var_end
+	%_144 = getelementptr i8, i8* %this, i32 24
+	%_145 = bitcast i8* %_144 to i1* 
+	%_146 = load i1, i1* %_145
+	store i1 %_146,i1* %var_end
 
-	%_307 = getelementptr i8, i8* %this, i32 8
-	%_308 = bitcast i8* %_307 to i8** 
-	%_309 = load i8*, i8** %_308
-	store i8* %_309,i8** %var_elem
+	%_147 = getelementptr i8, i8* %this, i32 8
+	%_148 = bitcast i8* %_147 to i8** 
+	%_149 = load i8*, i8** %_148
+	store i8* %_149,i8** %var_elem
 
 	br label %loop7
 	loop7: 
-	%_310 = load i1, i1* %var_end
-%_311 = xor i1 1, %_310
+	%_150 = load i1, i1* %var_end
+	%_151 = xor i1 1, %_150
 
-	br i1 %_311, label %and_clause11, label %and_clause10 
+	br i1 %_151, label %and_clause11, label %and_clause10 
 	and_clause10: 
 	br label %and_clause12
 	and_clause11: 
-	%_312 = load i1, i1* %ret_val
-%_313 = xor i1 1, %_312
+	%_152 = load i1, i1* %ret_val
+	%_153 = xor i1 1, %_152
 
 	br label %and_clause12
 	and_clause12: 
 	br label %and_clause13
 	and_clause13: 
-	%_314 = phi i1 [ 0, %and_clause10 ], [ %_313, %and_clause12] 
+	%_154 = phi i1 [ 0, %and_clause10 ], [ %_153, %and_clause12] 
 
-	br i1 %_314, label %loop8, label %loop9 
+	br i1 %_154, label %loop8, label %loop9 
 	loop8: 
-	%_315 = load i8*, i8** %e
-	%_319 = bitcast i8* %_315 to i8*** 
-	%_320 = load i8**, i8*** %_319 
-	%_321 = getelementptr i8*, i8** %_320, i32 4 
-	%_322 = load i8*, i8** %_321 
-	%_323 = bitcast i8* %_322 to i1 (i8* , i8*)* 
-	%_324 = load i8*, i8** %var_elem
-	%_325 = call i1 %_323( i8* %_315, i8* %_324) 
+	%_155 = load i8*, i8** %e
+	%_159 = bitcast i8* %_155 to i8*** 
+	%_160 = load i8**, i8*** %_159 
+	%_161 = getelementptr i8*, i8** %_160, i32 4 
+	%_162 = load i8*, i8** %_161 
+	%_163 = bitcast i8* %_162 to i1 (i8* , i8*)* 
+	%_164 = load i8*, i8** %var_elem
+	%_165 = call i1 %_163( i8* %_155, i8* %_164) 
 
-	br i1 %_325, label %if_then_14, label %if_else_14 
+	br i1 %_165, label %if_then_14, label %if_else_14 
 	if_else_14: 
 	store i32 0,i32* %nt
 
@@ -458,48 +440,48 @@ define i8* @List.Delete(i8* %this, i8* %.e) {
 	if_then_14: 
 	store i1 1,i1* %ret_val
 
-	%_336 = load i32, i32* %aux04
-	%_337 = icmp slt i32 %_336, 0
+	%_166 = load i32, i32* %aux04
+	%_167 = icmp slt i32 %_166, 0
 
-	br i1 %_337, label %if_then_15, label %if_else_15 
+	br i1 %_167, label %if_then_15, label %if_else_15 
 	if_else_15: 
-	%_338 = sub i32 0, 555
+	%_168 = sub i32 0, 555
 
-	call void (i32) @print_int(i32 %_338)
+	call void (i32) @print_int(i32 %_168)
 
-	%_344 = load i8*, i8** %prev
-	%_348 = bitcast i8* %_344 to i8*** 
-	%_349 = load i8**, i8*** %_348 
-	%_350 = getelementptr i8*, i8** %_349, i32 3 
-	%_351 = load i8*, i8** %_350 
-	%_352 = bitcast i8* %_351 to i1 (i8* , i8*)* 
-	%_353 = load i8*, i8** %aux01
-	%_357 = bitcast i8* %_353 to i8*** 
-	%_358 = load i8**, i8*** %_357 
-	%_359 = getelementptr i8*, i8** %_358, i32 8 
-	%_360 = load i8*, i8** %_359 
-	%_361 = bitcast i8* %_360 to i8* (i8* )* 
-	%_362 = call i8* %_361( i8* %_353) 
+	%_169 = load i8*, i8** %prev
+	%_173 = bitcast i8* %_169 to i8*** 
+	%_174 = load i8**, i8*** %_173 
+	%_175 = getelementptr i8*, i8** %_174, i32 3 
+	%_176 = load i8*, i8** %_175 
+	%_177 = bitcast i8* %_176 to i1 (i8* , i8*)* 
+	%_178 = load i8*, i8** %aux01
+	%_182 = bitcast i8* %_178 to i8*** 
+	%_183 = load i8**, i8*** %_182 
+	%_184 = getelementptr i8*, i8** %_183, i32 8 
+	%_185 = load i8*, i8** %_184 
+	%_186 = bitcast i8* %_185 to i8* (i8* )* 
+	%_187 = call i8* %_186( i8* %_178) 
 
-	%_363 = call i1 %_352( i8* %_344, i8* %_362) 
+	%_188 = call i1 %_177( i8* %_169, i8* %_187) 
 
-	store i1 %_363,i1* %aux05
+	store i1 %_188,i1* %aux05
 
-	%_364 = sub i32 0, 555
+	%_189 = sub i32 0, 555
 
-	call void (i32) @print_int(i32 %_364)
+	call void (i32) @print_int(i32 %_189)
 
 	br label %if_end_15
 	if_then_15: 
-	%_370 = load i8*, i8** %aux01
-	%_374 = bitcast i8* %_370 to i8*** 
-	%_375 = load i8**, i8*** %_374 
-	%_376 = getelementptr i8*, i8** %_375, i32 8 
-	%_377 = load i8*, i8** %_376 
-	%_378 = bitcast i8* %_377 to i8* (i8* )* 
-	%_379 = call i8* %_378( i8* %_370) 
+	%_190 = load i8*, i8** %aux01
+	%_194 = bitcast i8* %_190 to i8*** 
+	%_195 = load i8**, i8*** %_194 
+	%_196 = getelementptr i8*, i8** %_195, i32 8 
+	%_197 = load i8*, i8** %_196 
+	%_198 = bitcast i8* %_197 to i8* (i8* )* 
+	%_199 = call i8* %_198( i8* %_190) 
 
-	store i8* %_379,i8** %my_head
+	store i8* %_199,i8** %my_head
 
 	br label %if_end_15
 	if_end_15: 
@@ -507,47 +489,47 @@ define i8* @List.Delete(i8* %this, i8* %.e) {
 	br label %if_end_14
 	if_end_14: 
 
-	%_380 = load i1, i1* %ret_val
-%_381 = xor i1 1, %_380
+	%_200 = load i1, i1* %ret_val
+	%_201 = xor i1 1, %_200
 
-	br i1 %_381, label %if_then_16, label %if_else_16 
+	br i1 %_201, label %if_then_16, label %if_else_16 
 	if_else_16: 
 	store i32 0,i32* %nt
 
 	br label %if_end_16
 	if_then_16: 
-	%_392 = load i8*, i8** %aux01
-	store i8* %_392,i8** %prev
+	%_202 = load i8*, i8** %aux01
+	store i8* %_202,i8** %prev
 
-	%_398 = load i8*, i8** %aux01
-	%_402 = bitcast i8* %_398 to i8*** 
-	%_403 = load i8**, i8*** %_402 
-	%_404 = getelementptr i8*, i8** %_403, i32 8 
-	%_405 = load i8*, i8** %_404 
-	%_406 = bitcast i8* %_405 to i8* (i8* )* 
-	%_407 = call i8* %_406( i8* %_398) 
+	%_203 = load i8*, i8** %aux01
+	%_207 = bitcast i8* %_203 to i8*** 
+	%_208 = load i8**, i8*** %_207 
+	%_209 = getelementptr i8*, i8** %_208, i32 8 
+	%_210 = load i8*, i8** %_209 
+	%_211 = bitcast i8* %_210 to i8* (i8* )* 
+	%_212 = call i8* %_211( i8* %_203) 
 
-	store i8* %_407,i8** %aux01
+	store i8* %_212,i8** %aux01
 
-	%_413 = load i8*, i8** %aux01
-	%_417 = bitcast i8* %_413 to i8*** 
-	%_418 = load i8**, i8*** %_417 
-	%_419 = getelementptr i8*, i8** %_418, i32 6 
-	%_420 = load i8*, i8** %_419 
-	%_421 = bitcast i8* %_420 to i1 (i8* )* 
-	%_422 = call i1 %_421( i8* %_413) 
+	%_213 = load i8*, i8** %aux01
+	%_217 = bitcast i8* %_213 to i8*** 
+	%_218 = load i8**, i8*** %_217 
+	%_219 = getelementptr i8*, i8** %_218, i32 6 
+	%_220 = load i8*, i8** %_219 
+	%_221 = bitcast i8* %_220 to i1 (i8* )* 
+	%_222 = call i1 %_221( i8* %_213) 
 
-	store i1 %_422,i1* %var_end
+	store i1 %_222,i1* %var_end
 
-	%_428 = load i8*, i8** %aux01
-	%_432 = bitcast i8* %_428 to i8*** 
-	%_433 = load i8**, i8*** %_432 
-	%_434 = getelementptr i8*, i8** %_433, i32 7 
-	%_435 = load i8*, i8** %_434 
-	%_436 = bitcast i8* %_435 to i8* (i8* )* 
-	%_437 = call i8* %_436( i8* %_428) 
+	%_223 = load i8*, i8** %aux01
+	%_227 = bitcast i8* %_223 to i8*** 
+	%_228 = load i8**, i8*** %_227 
+	%_229 = getelementptr i8*, i8** %_228, i32 7 
+	%_230 = load i8*, i8** %_229 
+	%_231 = bitcast i8* %_230 to i8* (i8* )* 
+	%_232 = call i8* %_231( i8* %_223) 
 
-	store i8* %_437,i8** %var_elem
+	store i8* %_232,i8** %var_elem
 
 	store i32 1,i32* %aux04
 
@@ -557,54 +539,49 @@ define i8* @List.Delete(i8* %this, i8* %.e) {
 	br label %loop7
 	loop9: 
 
-	%_443 = load i8*, i8** %my_head
-	ret i8* %_443
+	%_233 = load i8*, i8** %my_head
+	ret i8* %_233
 }
  
 define i32 @List.Search(i8* %this, i8* %.e) {
 	%e = alloca i8*
 	store i8* %.e, i8** %e
 	%int_ret_val = alloca i32
-
 	%aux01 = alloca i8*
-
 	%var_elem = alloca i8*
-
 	%var_end = alloca i1
-
 	%nt = alloca i32
-
 	store i32 0,i32* %int_ret_val
 
 	store i8* %this,i8** %aux01
 
-	%_459 = getelementptr i8, i8* %this, i32 24
-	%_460 = bitcast i8* %_459 to i1* 
-	%_461 = load i1, i1* %_460
-	store i1 %_461,i1* %var_end
+	%_234 = getelementptr i8, i8* %this, i32 24
+	%_235 = bitcast i8* %_234 to i1* 
+	%_236 = load i1, i1* %_235
+	store i1 %_236,i1* %var_end
 
-	%_467 = getelementptr i8, i8* %this, i32 8
-	%_468 = bitcast i8* %_467 to i8** 
-	%_469 = load i8*, i8** %_468
-	store i8* %_469,i8** %var_elem
+	%_237 = getelementptr i8, i8* %this, i32 8
+	%_238 = bitcast i8* %_237 to i8** 
+	%_239 = load i8*, i8** %_238
+	store i8* %_239,i8** %var_elem
 
 	br label %loop17
 	loop17: 
-	%_470 = load i1, i1* %var_end
-%_471 = xor i1 1, %_470
+	%_240 = load i1, i1* %var_end
+	%_241 = xor i1 1, %_240
 
-	br i1 %_471, label %loop18, label %loop19 
+	br i1 %_241, label %loop18, label %loop19 
 	loop18: 
-	%_472 = load i8*, i8** %e
-	%_476 = bitcast i8* %_472 to i8*** 
-	%_477 = load i8**, i8*** %_476 
-	%_478 = getelementptr i8*, i8** %_477, i32 4 
-	%_479 = load i8*, i8** %_478 
-	%_480 = bitcast i8* %_479 to i1 (i8* , i8*)* 
-	%_481 = load i8*, i8** %var_elem
-	%_482 = call i1 %_480( i8* %_472, i8* %_481) 
+	%_242 = load i8*, i8** %e
+	%_246 = bitcast i8* %_242 to i8*** 
+	%_247 = load i8**, i8*** %_246 
+	%_248 = getelementptr i8*, i8** %_247, i32 4 
+	%_249 = load i8*, i8** %_248 
+	%_250 = bitcast i8* %_249 to i1 (i8* , i8*)* 
+	%_251 = load i8*, i8** %var_elem
+	%_252 = call i1 %_250( i8* %_242, i8* %_251) 
 
-	br i1 %_482, label %if_then_20, label %if_else_20 
+	br i1 %_252, label %if_then_20, label %if_else_20 
 	if_else_20: 
 	store i32 0,i32* %nt
 
@@ -615,129 +592,126 @@ define i32 @List.Search(i8* %this, i8* %.e) {
 	br label %if_end_20
 	if_end_20: 
 
-	%_498 = load i8*, i8** %aux01
-	%_502 = bitcast i8* %_498 to i8*** 
-	%_503 = load i8**, i8*** %_502 
-	%_504 = getelementptr i8*, i8** %_503, i32 8 
-	%_505 = load i8*, i8** %_504 
-	%_506 = bitcast i8* %_505 to i8* (i8* )* 
-	%_507 = call i8* %_506( i8* %_498) 
+	%_253 = load i8*, i8** %aux01
+	%_257 = bitcast i8* %_253 to i8*** 
+	%_258 = load i8**, i8*** %_257 
+	%_259 = getelementptr i8*, i8** %_258, i32 8 
+	%_260 = load i8*, i8** %_259 
+	%_261 = bitcast i8* %_260 to i8* (i8* )* 
+	%_262 = call i8* %_261( i8* %_253) 
 
-	store i8* %_507,i8** %aux01
+	store i8* %_262,i8** %aux01
 
-	%_513 = load i8*, i8** %aux01
-	%_517 = bitcast i8* %_513 to i8*** 
-	%_518 = load i8**, i8*** %_517 
-	%_519 = getelementptr i8*, i8** %_518, i32 6 
-	%_520 = load i8*, i8** %_519 
-	%_521 = bitcast i8* %_520 to i1 (i8* )* 
-	%_522 = call i1 %_521( i8* %_513) 
+	%_263 = load i8*, i8** %aux01
+	%_267 = bitcast i8* %_263 to i8*** 
+	%_268 = load i8**, i8*** %_267 
+	%_269 = getelementptr i8*, i8** %_268, i32 6 
+	%_270 = load i8*, i8** %_269 
+	%_271 = bitcast i8* %_270 to i1 (i8* )* 
+	%_272 = call i1 %_271( i8* %_263) 
 
-	store i1 %_522,i1* %var_end
+	store i1 %_272,i1* %var_end
 
-	%_528 = load i8*, i8** %aux01
-	%_532 = bitcast i8* %_528 to i8*** 
-	%_533 = load i8**, i8*** %_532 
-	%_534 = getelementptr i8*, i8** %_533, i32 7 
-	%_535 = load i8*, i8** %_534 
-	%_536 = bitcast i8* %_535 to i8* (i8* )* 
-	%_537 = call i8* %_536( i8* %_528) 
+	%_273 = load i8*, i8** %aux01
+	%_277 = bitcast i8* %_273 to i8*** 
+	%_278 = load i8**, i8*** %_277 
+	%_279 = getelementptr i8*, i8** %_278, i32 7 
+	%_280 = load i8*, i8** %_279 
+	%_281 = bitcast i8* %_280 to i8* (i8* )* 
+	%_282 = call i8* %_281( i8* %_273) 
 
-	store i8* %_537,i8** %var_elem
+	store i8* %_282,i8** %var_elem
 
 	br label %loop17
 	loop19: 
 
-	%_538 = load i32, i32* %int_ret_val
-	ret i32 %_538
+	%_283 = load i32, i32* %int_ret_val
+	ret i32 %_283
 }
  
 define i1 @List.GetEnd(i8* %this) {
-	%_539 = getelementptr i8, i8* %this, i32 24
-	%_540 = bitcast i8* %_539 to i1* 
-	%_541 = load i1, i1* %_540
-	ret i1 %_541
+	%_284 = getelementptr i8, i8* %this, i32 24
+	%_285 = bitcast i8* %_284 to i1* 
+	%_286 = load i1, i1* %_285
+	ret i1 %_286
 }
  
 define i8* @List.GetElem(i8* %this) {
-	%_542 = getelementptr i8, i8* %this, i32 8
-	%_543 = bitcast i8* %_542 to i8** 
-	%_544 = load i8*, i8** %_543
-	ret i8* %_544
+	%_287 = getelementptr i8, i8* %this, i32 8
+	%_288 = bitcast i8* %_287 to i8** 
+	%_289 = load i8*, i8** %_288
+	ret i8* %_289
 }
  
 define i8* @List.GetNext(i8* %this) {
-	%_545 = getelementptr i8, i8* %this, i32 16
-	%_546 = bitcast i8* %_545 to i8** 
-	%_547 = load i8*, i8** %_546
-	ret i8* %_547
+	%_290 = getelementptr i8, i8* %this, i32 16
+	%_291 = bitcast i8* %_290 to i8** 
+	%_292 = load i8*, i8** %_291
+	ret i8* %_292
 }
  
 define i1 @List.Print(i8* %this) {
 	%aux01 = alloca i8*
-
 	%var_end = alloca i1
-
 	%var_elem = alloca i8*
-
 	store i8* %this,i8** %aux01
 
-	%_558 = getelementptr i8, i8* %this, i32 24
-	%_559 = bitcast i8* %_558 to i1* 
-	%_560 = load i1, i1* %_559
-	store i1 %_560,i1* %var_end
+	%_293 = getelementptr i8, i8* %this, i32 24
+	%_294 = bitcast i8* %_293 to i1* 
+	%_295 = load i1, i1* %_294
+	store i1 %_295,i1* %var_end
 
-	%_566 = getelementptr i8, i8* %this, i32 8
-	%_567 = bitcast i8* %_566 to i8** 
-	%_568 = load i8*, i8** %_567
-	store i8* %_568,i8** %var_elem
+	%_296 = getelementptr i8, i8* %this, i32 8
+	%_297 = bitcast i8* %_296 to i8** 
+	%_298 = load i8*, i8** %_297
+	store i8* %_298,i8** %var_elem
 
 	br label %loop21
 	loop21: 
-	%_569 = load i1, i1* %var_end
-%_570 = xor i1 1, %_569
+	%_299 = load i1, i1* %var_end
+	%_300 = xor i1 1, %_299
 
-	br i1 %_570, label %loop22, label %loop23 
+	br i1 %_300, label %loop22, label %loop23 
 	loop22: 
-	%_571 = load i8*, i8** %var_elem
-	%_575 = bitcast i8* %_571 to i8*** 
-	%_576 = load i8**, i8*** %_575 
-	%_577 = getelementptr i8*, i8** %_576, i32 1 
-	%_578 = load i8*, i8** %_577 
-	%_579 = bitcast i8* %_578 to i32 (i8* )* 
-	%_580 = call i32 %_579( i8* %_571) 
+	%_301 = load i8*, i8** %var_elem
+	%_305 = bitcast i8* %_301 to i8*** 
+	%_306 = load i8**, i8*** %_305 
+	%_307 = getelementptr i8*, i8** %_306, i32 1 
+	%_308 = load i8*, i8** %_307 
+	%_309 = bitcast i8* %_308 to i32 (i8* )* 
+	%_310 = call i32 %_309( i8* %_301) 
 
-	call void (i32) @print_int(i32 %_580)
+	call void (i32) @print_int(i32 %_310)
 
-	%_586 = load i8*, i8** %aux01
-	%_590 = bitcast i8* %_586 to i8*** 
-	%_591 = load i8**, i8*** %_590 
-	%_592 = getelementptr i8*, i8** %_591, i32 8 
-	%_593 = load i8*, i8** %_592 
-	%_594 = bitcast i8* %_593 to i8* (i8* )* 
-	%_595 = call i8* %_594( i8* %_586) 
+	%_311 = load i8*, i8** %aux01
+	%_315 = bitcast i8* %_311 to i8*** 
+	%_316 = load i8**, i8*** %_315 
+	%_317 = getelementptr i8*, i8** %_316, i32 8 
+	%_318 = load i8*, i8** %_317 
+	%_319 = bitcast i8* %_318 to i8* (i8* )* 
+	%_320 = call i8* %_319( i8* %_311) 
 
-	store i8* %_595,i8** %aux01
+	store i8* %_320,i8** %aux01
 
-	%_601 = load i8*, i8** %aux01
-	%_605 = bitcast i8* %_601 to i8*** 
-	%_606 = load i8**, i8*** %_605 
-	%_607 = getelementptr i8*, i8** %_606, i32 6 
-	%_608 = load i8*, i8** %_607 
-	%_609 = bitcast i8* %_608 to i1 (i8* )* 
-	%_610 = call i1 %_609( i8* %_601) 
+	%_321 = load i8*, i8** %aux01
+	%_325 = bitcast i8* %_321 to i8*** 
+	%_326 = load i8**, i8*** %_325 
+	%_327 = getelementptr i8*, i8** %_326, i32 6 
+	%_328 = load i8*, i8** %_327 
+	%_329 = bitcast i8* %_328 to i1 (i8* )* 
+	%_330 = call i1 %_329( i8* %_321) 
 
-	store i1 %_610,i1* %var_end
+	store i1 %_330,i1* %var_end
 
-	%_616 = load i8*, i8** %aux01
-	%_620 = bitcast i8* %_616 to i8*** 
-	%_621 = load i8**, i8*** %_620 
-	%_622 = getelementptr i8*, i8** %_621, i32 7 
-	%_623 = load i8*, i8** %_622 
-	%_624 = bitcast i8* %_623 to i8* (i8* )* 
-	%_625 = call i8* %_624( i8* %_616) 
+	%_331 = load i8*, i8** %aux01
+	%_335 = bitcast i8* %_331 to i8*** 
+	%_336 = load i8**, i8*** %_335 
+	%_337 = getelementptr i8*, i8** %_336, i32 7 
+	%_338 = load i8*, i8** %_337 
+	%_339 = bitcast i8* %_338 to i8* (i8* )* 
+	%_340 = call i8* %_339( i8* %_331) 
 
-	store i8* %_625,i8** %var_elem
+	store i8* %_340,i8** %var_elem
 
 	br label %loop21
 	loop23: 
@@ -747,302 +721,296 @@ define i1 @List.Print(i8* %this) {
  
 define i32 @LL.Start(i8* %this) {
 	%head = alloca i8*
-
 	%last_elem = alloca i8*
-
 	%aux01 = alloca i1
-
 	%el01 = alloca i8*
-
 	%el02 = alloca i8*
-
 	%el03 = alloca i8*
+	%_341 = call i8* @calloc(i32 1, i32 25)
+	%_342 = bitcast i8* %_341 to i8*** 
+	%_343 = getelementptr [10 x i8*], [10 x i8*]* @.List_vtable, i32 0, i32 0 
+	store i8** %_343, i8*** %_342
 
-	%_631 = call i8* @calloc(i32 1, i32 25)
-	%_632 = bitcast i8* %_631 to i8*** 
-	%_633 = getelementptr [10 x i8*], [10 x i8*]* @.List_vtable, i32 0, i32 0 
-	store i8** %_633, i8*** %_632
+	store i8* %_341,i8** %last_elem
 
-	store i8* %_631,i8** %last_elem
+	%_344 = load i8*, i8** %last_elem
+	%_348 = bitcast i8* %_344 to i8*** 
+	%_349 = load i8**, i8*** %_348 
+	%_350 = getelementptr i8*, i8** %_349, i32 0 
+	%_351 = load i8*, i8** %_350 
+	%_352 = bitcast i8* %_351 to i1 (i8* )* 
+	%_353 = call i1 %_352( i8* %_344) 
 
-	%_639 = load i8*, i8** %last_elem
-	%_643 = bitcast i8* %_639 to i8*** 
-	%_644 = load i8**, i8*** %_643 
-	%_645 = getelementptr i8*, i8** %_644, i32 0 
-	%_646 = load i8*, i8** %_645 
-	%_647 = bitcast i8* %_646 to i1 (i8* )* 
-	%_648 = call i1 %_647( i8* %_639) 
+	store i1 %_353,i1* %aux01
 
-	store i1 %_648,i1* %aux01
+	%_354 = load i8*, i8** %last_elem
+	store i8* %_354,i8** %head
 
-	%_654 = load i8*, i8** %last_elem
-	store i8* %_654,i8** %head
+	%_355 = load i8*, i8** %head
+	%_359 = bitcast i8* %_355 to i8*** 
+	%_360 = load i8**, i8*** %_359 
+	%_361 = getelementptr i8*, i8** %_360, i32 0 
+	%_362 = load i8*, i8** %_361 
+	%_363 = bitcast i8* %_362 to i1 (i8* )* 
+	%_364 = call i1 %_363( i8* %_355) 
 
-	%_660 = load i8*, i8** %head
-	%_664 = bitcast i8* %_660 to i8*** 
-	%_665 = load i8**, i8*** %_664 
-	%_666 = getelementptr i8*, i8** %_665, i32 0 
-	%_667 = load i8*, i8** %_666 
-	%_668 = bitcast i8* %_667 to i1 (i8* )* 
-	%_669 = call i1 %_668( i8* %_660) 
+	store i1 %_364,i1* %aux01
 
-	store i1 %_669,i1* %aux01
+	%_365 = load i8*, i8** %head
+	%_369 = bitcast i8* %_365 to i8*** 
+	%_370 = load i8**, i8*** %_369 
+	%_371 = getelementptr i8*, i8** %_370, i32 9 
+	%_372 = load i8*, i8** %_371 
+	%_373 = bitcast i8* %_372 to i1 (i8* )* 
+	%_374 = call i1 %_373( i8* %_365) 
 
-	%_675 = load i8*, i8** %head
-	%_679 = bitcast i8* %_675 to i8*** 
-	%_680 = load i8**, i8*** %_679 
-	%_681 = getelementptr i8*, i8** %_680, i32 9 
-	%_682 = load i8*, i8** %_681 
-	%_683 = bitcast i8* %_682 to i1 (i8* )* 
-	%_684 = call i1 %_683( i8* %_675) 
+	store i1 %_374,i1* %aux01
 
-	store i1 %_684,i1* %aux01
+	%_375 = call i8* @calloc(i32 1, i32 17)
+	%_376 = bitcast i8* %_375 to i8*** 
+	%_377 = getelementptr [6 x i8*], [6 x i8*]* @.Element_vtable, i32 0, i32 0 
+	store i8** %_377, i8*** %_376
 
-	%_690 = call i8* @calloc(i32 1, i32 17)
-	%_691 = bitcast i8* %_690 to i8*** 
-	%_692 = getelementptr [6 x i8*], [6 x i8*]* @.Element_vtable, i32 0, i32 0 
-	store i8** %_692, i8*** %_691
+	store i8* %_375,i8** %el01
 
-	store i8* %_690,i8** %el01
+	%_378 = load i8*, i8** %el01
+	%_382 = bitcast i8* %_378 to i8*** 
+	%_383 = load i8**, i8*** %_382 
+	%_384 = getelementptr i8*, i8** %_383, i32 0 
+	%_385 = load i8*, i8** %_384 
+	%_386 = bitcast i8* %_385 to i1 (i8* , i32, i32, i1)* 
+	%_387 = call i1 %_386( i8* %_378, i32 25, i32 37000, i1 0) 
 
-	%_698 = load i8*, i8** %el01
-	%_702 = bitcast i8* %_698 to i8*** 
-	%_703 = load i8**, i8*** %_702 
-	%_704 = getelementptr i8*, i8** %_703, i32 0 
-	%_705 = load i8*, i8** %_704 
-	%_706 = bitcast i8* %_705 to i1 (i8* , i32, i32, i1)* 
-	%_707 = call i1 %_706( i8* %_698, i32 25, i32 37000, i1 0) 
+	store i1 %_387,i1* %aux01
 
-	store i1 %_707,i1* %aux01
+	%_388 = load i8*, i8** %head
+	%_392 = bitcast i8* %_388 to i8*** 
+	%_393 = load i8**, i8*** %_392 
+	%_394 = getelementptr i8*, i8** %_393, i32 2 
+	%_395 = load i8*, i8** %_394 
+	%_396 = bitcast i8* %_395 to i8* (i8* , i8*)* 
+	%_397 = load i8*, i8** %el01
+	%_398 = call i8* %_396( i8* %_388, i8* %_397) 
 
-	%_713 = load i8*, i8** %head
-	%_717 = bitcast i8* %_713 to i8*** 
-	%_718 = load i8**, i8*** %_717 
-	%_719 = getelementptr i8*, i8** %_718, i32 2 
-	%_720 = load i8*, i8** %_719 
-	%_721 = bitcast i8* %_720 to i8* (i8* , i8*)* 
-	%_722 = load i8*, i8** %el01
-	%_723 = call i8* %_721( i8* %_713, i8* %_722) 
+	store i8* %_398,i8** %head
 
-	store i8* %_723,i8** %head
+	%_399 = load i8*, i8** %head
+	%_403 = bitcast i8* %_399 to i8*** 
+	%_404 = load i8**, i8*** %_403 
+	%_405 = getelementptr i8*, i8** %_404, i32 9 
+	%_406 = load i8*, i8** %_405 
+	%_407 = bitcast i8* %_406 to i1 (i8* )* 
+	%_408 = call i1 %_407( i8* %_399) 
 
-	%_729 = load i8*, i8** %head
-	%_733 = bitcast i8* %_729 to i8*** 
-	%_734 = load i8**, i8*** %_733 
-	%_735 = getelementptr i8*, i8** %_734, i32 9 
-	%_736 = load i8*, i8** %_735 
-	%_737 = bitcast i8* %_736 to i1 (i8* )* 
-	%_738 = call i1 %_737( i8* %_729) 
-
-	store i1 %_738,i1* %aux01
-
-	call void (i32) @print_int(i32 10000000)
-
-	%_744 = call i8* @calloc(i32 1, i32 17)
-	%_745 = bitcast i8* %_744 to i8*** 
-	%_746 = getelementptr [6 x i8*], [6 x i8*]* @.Element_vtable, i32 0, i32 0 
-	store i8** %_746, i8*** %_745
-
-	store i8* %_744,i8** %el01
-
-	%_752 = load i8*, i8** %el01
-	%_756 = bitcast i8* %_752 to i8*** 
-	%_757 = load i8**, i8*** %_756 
-	%_758 = getelementptr i8*, i8** %_757, i32 0 
-	%_759 = load i8*, i8** %_758 
-	%_760 = bitcast i8* %_759 to i1 (i8* , i32, i32, i1)* 
-	%_761 = call i1 %_760( i8* %_752, i32 39, i32 42000, i1 1) 
-
-	store i1 %_761,i1* %aux01
-
-	%_767 = load i8*, i8** %el01
-	store i8* %_767,i8** %el02
-
-	%_773 = load i8*, i8** %head
-	%_777 = bitcast i8* %_773 to i8*** 
-	%_778 = load i8**, i8*** %_777 
-	%_779 = getelementptr i8*, i8** %_778, i32 2 
-	%_780 = load i8*, i8** %_779 
-	%_781 = bitcast i8* %_780 to i8* (i8* , i8*)* 
-	%_782 = load i8*, i8** %el01
-	%_783 = call i8* %_781( i8* %_773, i8* %_782) 
-
-	store i8* %_783,i8** %head
-
-	%_789 = load i8*, i8** %head
-	%_793 = bitcast i8* %_789 to i8*** 
-	%_794 = load i8**, i8*** %_793 
-	%_795 = getelementptr i8*, i8** %_794, i32 9 
-	%_796 = load i8*, i8** %_795 
-	%_797 = bitcast i8* %_796 to i1 (i8* )* 
-	%_798 = call i1 %_797( i8* %_789) 
-
-	store i1 %_798,i1* %aux01
+	store i1 %_408,i1* %aux01
 
 	call void (i32) @print_int(i32 10000000)
 
-	%_804 = call i8* @calloc(i32 1, i32 17)
-	%_805 = bitcast i8* %_804 to i8*** 
-	%_806 = getelementptr [6 x i8*], [6 x i8*]* @.Element_vtable, i32 0, i32 0 
-	store i8** %_806, i8*** %_805
+	%_409 = call i8* @calloc(i32 1, i32 17)
+	%_410 = bitcast i8* %_409 to i8*** 
+	%_411 = getelementptr [6 x i8*], [6 x i8*]* @.Element_vtable, i32 0, i32 0 
+	store i8** %_411, i8*** %_410
 
-	store i8* %_804,i8** %el01
+	store i8* %_409,i8** %el01
 
-	%_812 = load i8*, i8** %el01
-	%_816 = bitcast i8* %_812 to i8*** 
-	%_817 = load i8**, i8*** %_816 
-	%_818 = getelementptr i8*, i8** %_817, i32 0 
-	%_819 = load i8*, i8** %_818 
-	%_820 = bitcast i8* %_819 to i1 (i8* , i32, i32, i1)* 
-	%_821 = call i1 %_820( i8* %_812, i32 22, i32 34000, i1 0) 
+	%_412 = load i8*, i8** %el01
+	%_416 = bitcast i8* %_412 to i8*** 
+	%_417 = load i8**, i8*** %_416 
+	%_418 = getelementptr i8*, i8** %_417, i32 0 
+	%_419 = load i8*, i8** %_418 
+	%_420 = bitcast i8* %_419 to i1 (i8* , i32, i32, i1)* 
+	%_421 = call i1 %_420( i8* %_412, i32 39, i32 42000, i1 1) 
 
-	store i1 %_821,i1* %aux01
+	store i1 %_421,i1* %aux01
 
-	%_827 = load i8*, i8** %head
-	%_831 = bitcast i8* %_827 to i8*** 
-	%_832 = load i8**, i8*** %_831 
-	%_833 = getelementptr i8*, i8** %_832, i32 2 
-	%_834 = load i8*, i8** %_833 
-	%_835 = bitcast i8* %_834 to i8* (i8* , i8*)* 
-	%_836 = load i8*, i8** %el01
-	%_837 = call i8* %_835( i8* %_827, i8* %_836) 
+	%_422 = load i8*, i8** %el01
+	store i8* %_422,i8** %el02
 
-	store i8* %_837,i8** %head
+	%_423 = load i8*, i8** %head
+	%_427 = bitcast i8* %_423 to i8*** 
+	%_428 = load i8**, i8*** %_427 
+	%_429 = getelementptr i8*, i8** %_428, i32 2 
+	%_430 = load i8*, i8** %_429 
+	%_431 = bitcast i8* %_430 to i8* (i8* , i8*)* 
+	%_432 = load i8*, i8** %el01
+	%_433 = call i8* %_431( i8* %_423, i8* %_432) 
 
-	%_843 = load i8*, i8** %head
-	%_847 = bitcast i8* %_843 to i8*** 
-	%_848 = load i8**, i8*** %_847 
-	%_849 = getelementptr i8*, i8** %_848, i32 9 
-	%_850 = load i8*, i8** %_849 
-	%_851 = bitcast i8* %_850 to i1 (i8* )* 
-	%_852 = call i1 %_851( i8* %_843) 
+	store i8* %_433,i8** %head
 
-	store i1 %_852,i1* %aux01
+	%_434 = load i8*, i8** %head
+	%_438 = bitcast i8* %_434 to i8*** 
+	%_439 = load i8**, i8*** %_438 
+	%_440 = getelementptr i8*, i8** %_439, i32 9 
+	%_441 = load i8*, i8** %_440 
+	%_442 = bitcast i8* %_441 to i1 (i8* )* 
+	%_443 = call i1 %_442( i8* %_434) 
 
-	%_858 = call i8* @calloc(i32 1, i32 17)
-	%_859 = bitcast i8* %_858 to i8*** 
-	%_860 = getelementptr [6 x i8*], [6 x i8*]* @.Element_vtable, i32 0, i32 0 
-	store i8** %_860, i8*** %_859
-
-	store i8* %_858,i8** %el03
-
-	%_866 = load i8*, i8** %el03
-	%_870 = bitcast i8* %_866 to i8*** 
-	%_871 = load i8**, i8*** %_870 
-	%_872 = getelementptr i8*, i8** %_871, i32 0 
-	%_873 = load i8*, i8** %_872 
-	%_874 = bitcast i8* %_873 to i1 (i8* , i32, i32, i1)* 
-	%_875 = call i1 %_874( i8* %_866, i32 27, i32 34000, i1 0) 
-
-	store i1 %_875,i1* %aux01
-
-	%_876 = load i8*, i8** %head
-	%_880 = bitcast i8* %_876 to i8*** 
-	%_881 = load i8**, i8*** %_880 
-	%_882 = getelementptr i8*, i8** %_881, i32 5 
-	%_883 = load i8*, i8** %_882 
-	%_884 = bitcast i8* %_883 to i32 (i8* , i8*)* 
-	%_885 = load i8*, i8** %el02
-	%_886 = call i32 %_884( i8* %_876, i8* %_885) 
-
-	call void (i32) @print_int(i32 %_886)
-
-	%_887 = load i8*, i8** %head
-	%_891 = bitcast i8* %_887 to i8*** 
-	%_892 = load i8**, i8*** %_891 
-	%_893 = getelementptr i8*, i8** %_892, i32 5 
-	%_894 = load i8*, i8** %_893 
-	%_895 = bitcast i8* %_894 to i32 (i8* , i8*)* 
-	%_896 = load i8*, i8** %el03
-	%_897 = call i32 %_895( i8* %_887, i8* %_896) 
-
-	call void (i32) @print_int(i32 %_897)
+	store i1 %_443,i1* %aux01
 
 	call void (i32) @print_int(i32 10000000)
 
-	%_903 = call i8* @calloc(i32 1, i32 17)
-	%_904 = bitcast i8* %_903 to i8*** 
-	%_905 = getelementptr [6 x i8*], [6 x i8*]* @.Element_vtable, i32 0, i32 0 
-	store i8** %_905, i8*** %_904
+	%_444 = call i8* @calloc(i32 1, i32 17)
+	%_445 = bitcast i8* %_444 to i8*** 
+	%_446 = getelementptr [6 x i8*], [6 x i8*]* @.Element_vtable, i32 0, i32 0 
+	store i8** %_446, i8*** %_445
 
-	store i8* %_903,i8** %el01
+	store i8* %_444,i8** %el01
 
-	%_911 = load i8*, i8** %el01
-	%_915 = bitcast i8* %_911 to i8*** 
-	%_916 = load i8**, i8*** %_915 
-	%_917 = getelementptr i8*, i8** %_916, i32 0 
-	%_918 = load i8*, i8** %_917 
-	%_919 = bitcast i8* %_918 to i1 (i8* , i32, i32, i1)* 
-	%_920 = call i1 %_919( i8* %_911, i32 28, i32 35000, i1 0) 
+	%_447 = load i8*, i8** %el01
+	%_451 = bitcast i8* %_447 to i8*** 
+	%_452 = load i8**, i8*** %_451 
+	%_453 = getelementptr i8*, i8** %_452, i32 0 
+	%_454 = load i8*, i8** %_453 
+	%_455 = bitcast i8* %_454 to i1 (i8* , i32, i32, i1)* 
+	%_456 = call i1 %_455( i8* %_447, i32 22, i32 34000, i1 0) 
 
-	store i1 %_920,i1* %aux01
+	store i1 %_456,i1* %aux01
 
-	%_926 = load i8*, i8** %head
-	%_930 = bitcast i8* %_926 to i8*** 
-	%_931 = load i8**, i8*** %_930 
-	%_932 = getelementptr i8*, i8** %_931, i32 2 
-	%_933 = load i8*, i8** %_932 
-	%_934 = bitcast i8* %_933 to i8* (i8* , i8*)* 
-	%_935 = load i8*, i8** %el01
-	%_936 = call i8* %_934( i8* %_926, i8* %_935) 
+	%_457 = load i8*, i8** %head
+	%_461 = bitcast i8* %_457 to i8*** 
+	%_462 = load i8**, i8*** %_461 
+	%_463 = getelementptr i8*, i8** %_462, i32 2 
+	%_464 = load i8*, i8** %_463 
+	%_465 = bitcast i8* %_464 to i8* (i8* , i8*)* 
+	%_466 = load i8*, i8** %el01
+	%_467 = call i8* %_465( i8* %_457, i8* %_466) 
 
-	store i8* %_936,i8** %head
+	store i8* %_467,i8** %head
 
-	%_942 = load i8*, i8** %head
-	%_946 = bitcast i8* %_942 to i8*** 
-	%_947 = load i8**, i8*** %_946 
-	%_948 = getelementptr i8*, i8** %_947, i32 9 
-	%_949 = load i8*, i8** %_948 
-	%_950 = bitcast i8* %_949 to i1 (i8* )* 
-	%_951 = call i1 %_950( i8* %_942) 
+	%_468 = load i8*, i8** %head
+	%_472 = bitcast i8* %_468 to i8*** 
+	%_473 = load i8**, i8*** %_472 
+	%_474 = getelementptr i8*, i8** %_473, i32 9 
+	%_475 = load i8*, i8** %_474 
+	%_476 = bitcast i8* %_475 to i1 (i8* )* 
+	%_477 = call i1 %_476( i8* %_468) 
 
-	store i1 %_951,i1* %aux01
+	store i1 %_477,i1* %aux01
+
+	%_478 = call i8* @calloc(i32 1, i32 17)
+	%_479 = bitcast i8* %_478 to i8*** 
+	%_480 = getelementptr [6 x i8*], [6 x i8*]* @.Element_vtable, i32 0, i32 0 
+	store i8** %_480, i8*** %_479
+
+	store i8* %_478,i8** %el03
+
+	%_481 = load i8*, i8** %el03
+	%_485 = bitcast i8* %_481 to i8*** 
+	%_486 = load i8**, i8*** %_485 
+	%_487 = getelementptr i8*, i8** %_486, i32 0 
+	%_488 = load i8*, i8** %_487 
+	%_489 = bitcast i8* %_488 to i1 (i8* , i32, i32, i1)* 
+	%_490 = call i1 %_489( i8* %_481, i32 27, i32 34000, i1 0) 
+
+	store i1 %_490,i1* %aux01
+
+	%_491 = load i8*, i8** %head
+	%_495 = bitcast i8* %_491 to i8*** 
+	%_496 = load i8**, i8*** %_495 
+	%_497 = getelementptr i8*, i8** %_496, i32 5 
+	%_498 = load i8*, i8** %_497 
+	%_499 = bitcast i8* %_498 to i32 (i8* , i8*)* 
+	%_500 = load i8*, i8** %el02
+	%_501 = call i32 %_499( i8* %_491, i8* %_500) 
+
+	call void (i32) @print_int(i32 %_501)
+
+	%_502 = load i8*, i8** %head
+	%_506 = bitcast i8* %_502 to i8*** 
+	%_507 = load i8**, i8*** %_506 
+	%_508 = getelementptr i8*, i8** %_507, i32 5 
+	%_509 = load i8*, i8** %_508 
+	%_510 = bitcast i8* %_509 to i32 (i8* , i8*)* 
+	%_511 = load i8*, i8** %el03
+	%_512 = call i32 %_510( i8* %_502, i8* %_511) 
+
+	call void (i32) @print_int(i32 %_512)
+
+	call void (i32) @print_int(i32 10000000)
+
+	%_513 = call i8* @calloc(i32 1, i32 17)
+	%_514 = bitcast i8* %_513 to i8*** 
+	%_515 = getelementptr [6 x i8*], [6 x i8*]* @.Element_vtable, i32 0, i32 0 
+	store i8** %_515, i8*** %_514
+
+	store i8* %_513,i8** %el01
+
+	%_516 = load i8*, i8** %el01
+	%_520 = bitcast i8* %_516 to i8*** 
+	%_521 = load i8**, i8*** %_520 
+	%_522 = getelementptr i8*, i8** %_521, i32 0 
+	%_523 = load i8*, i8** %_522 
+	%_524 = bitcast i8* %_523 to i1 (i8* , i32, i32, i1)* 
+	%_525 = call i1 %_524( i8* %_516, i32 28, i32 35000, i1 0) 
+
+	store i1 %_525,i1* %aux01
+
+	%_526 = load i8*, i8** %head
+	%_530 = bitcast i8* %_526 to i8*** 
+	%_531 = load i8**, i8*** %_530 
+	%_532 = getelementptr i8*, i8** %_531, i32 2 
+	%_533 = load i8*, i8** %_532 
+	%_534 = bitcast i8* %_533 to i8* (i8* , i8*)* 
+	%_535 = load i8*, i8** %el01
+	%_536 = call i8* %_534( i8* %_526, i8* %_535) 
+
+	store i8* %_536,i8** %head
+
+	%_537 = load i8*, i8** %head
+	%_541 = bitcast i8* %_537 to i8*** 
+	%_542 = load i8**, i8*** %_541 
+	%_543 = getelementptr i8*, i8** %_542, i32 9 
+	%_544 = load i8*, i8** %_543 
+	%_545 = bitcast i8* %_544 to i1 (i8* )* 
+	%_546 = call i1 %_545( i8* %_537) 
+
+	store i1 %_546,i1* %aux01
 
 	call void (i32) @print_int(i32 2220000)
 
-	%_957 = load i8*, i8** %head
-	%_961 = bitcast i8* %_957 to i8*** 
-	%_962 = load i8**, i8*** %_961 
-	%_963 = getelementptr i8*, i8** %_962, i32 4 
-	%_964 = load i8*, i8** %_963 
-	%_965 = bitcast i8* %_964 to i8* (i8* , i8*)* 
-	%_966 = load i8*, i8** %el02
-	%_967 = call i8* %_965( i8* %_957, i8* %_966) 
+	%_547 = load i8*, i8** %head
+	%_551 = bitcast i8* %_547 to i8*** 
+	%_552 = load i8**, i8*** %_551 
+	%_553 = getelementptr i8*, i8** %_552, i32 4 
+	%_554 = load i8*, i8** %_553 
+	%_555 = bitcast i8* %_554 to i8* (i8* , i8*)* 
+	%_556 = load i8*, i8** %el02
+	%_557 = call i8* %_555( i8* %_547, i8* %_556) 
 
-	store i8* %_967,i8** %head
+	store i8* %_557,i8** %head
 
-	%_973 = load i8*, i8** %head
-	%_977 = bitcast i8* %_973 to i8*** 
-	%_978 = load i8**, i8*** %_977 
-	%_979 = getelementptr i8*, i8** %_978, i32 9 
-	%_980 = load i8*, i8** %_979 
-	%_981 = bitcast i8* %_980 to i1 (i8* )* 
-	%_982 = call i1 %_981( i8* %_973) 
+	%_558 = load i8*, i8** %head
+	%_562 = bitcast i8* %_558 to i8*** 
+	%_563 = load i8**, i8*** %_562 
+	%_564 = getelementptr i8*, i8** %_563, i32 9 
+	%_565 = load i8*, i8** %_564 
+	%_566 = bitcast i8* %_565 to i1 (i8* )* 
+	%_567 = call i1 %_566( i8* %_558) 
 
-	store i1 %_982,i1* %aux01
+	store i1 %_567,i1* %aux01
 
 	call void (i32) @print_int(i32 33300000)
 
-	%_988 = load i8*, i8** %head
-	%_992 = bitcast i8* %_988 to i8*** 
-	%_993 = load i8**, i8*** %_992 
-	%_994 = getelementptr i8*, i8** %_993, i32 4 
-	%_995 = load i8*, i8** %_994 
-	%_996 = bitcast i8* %_995 to i8* (i8* , i8*)* 
-	%_997 = load i8*, i8** %el01
-	%_998 = call i8* %_996( i8* %_988, i8* %_997) 
+	%_568 = load i8*, i8** %head
+	%_572 = bitcast i8* %_568 to i8*** 
+	%_573 = load i8**, i8*** %_572 
+	%_574 = getelementptr i8*, i8** %_573, i32 4 
+	%_575 = load i8*, i8** %_574 
+	%_576 = bitcast i8* %_575 to i8* (i8* , i8*)* 
+	%_577 = load i8*, i8** %el01
+	%_578 = call i8* %_576( i8* %_568, i8* %_577) 
 
-	store i8* %_998,i8** %head
+	store i8* %_578,i8** %head
 
-	%_1004 = load i8*, i8** %head
-	%_1008 = bitcast i8* %_1004 to i8*** 
-	%_1009 = load i8**, i8*** %_1008 
-	%_1010 = getelementptr i8*, i8** %_1009, i32 9 
-	%_1011 = load i8*, i8** %_1010 
-	%_1012 = bitcast i8* %_1011 to i1 (i8* )* 
-	%_1013 = call i1 %_1012( i8* %_1004) 
+	%_579 = load i8*, i8** %head
+	%_583 = bitcast i8* %_579 to i8*** 
+	%_584 = load i8**, i8*** %_583 
+	%_585 = getelementptr i8*, i8** %_584, i32 9 
+	%_586 = load i8*, i8** %_585 
+	%_587 = bitcast i8* %_586 to i1 (i8* )* 
+	%_588 = call i1 %_587( i8* %_579) 
 
-	store i1 %_1013,i1* %aux01
+	store i1 %_588,i1* %aux01
 
 	call void (i32) @print_int(i32 44440000)
 

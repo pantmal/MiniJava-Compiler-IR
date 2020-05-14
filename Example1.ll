@@ -57,65 +57,62 @@ define i32 @Test1.Start(i8* %this, i32 %.b, i1 %.c) {
 	%c = alloca i1
 	store i1 %.c, i1* %c
 	%ntb = alloca i1
-
 	%nti = alloca i32*
-
 	%ourint = alloca i32
-
-	%_17 = load i32, i32* %b
-	%_18 = add i32 1, %_17
-	%_19 = icmp sge i32 %_18, 1
-	br i1 %_19, label %nsz_ok_0, label %nsz_err_0
+	%_12 = load i32, i32* %b
+	%_13 = add i32 1, %_12
+	%_14 = icmp sge i32 %_13, 1
+	br i1 %_14, label %nsz_ok_0, label %nsz_err_0
  
 	nsz_err_0: 
 	call void @throw_nsz()
 	br label %nsz_ok_0
  
 	nsz_ok_0: 
-	%_20 = call i8* @calloc(i32 %_18, i32 4) 
-	%_21 = bitcast i8* %_20 to i32* 
-	store i32 %_17, i32* %_21
+	%_15 = call i8* @calloc(i32 %_13, i32 4) 
+	%_16 = bitcast i8* %_15 to i32* 
+	store i32 %_12, i32* %_16
  
 
-	store i32* %_21,i32** %nti
+	store i32* %_16,i32** %nti
 
-	%_27 = load i32*, i32** %nti
-	%_28 = load i32, i32* %_27
-	%_29 = icmp sge i32 0, 0
-	%_30 = icmp slt i32 0, %_28
-	%_31 = and i1 %_29, %_30
-	br i1 %_31, label %oob_ok_1, label %oob_err_1
+	%_17 = load i32*, i32** %nti
+	%_18 = load i32, i32* %_17
+	%_19 = icmp sge i32 0, 0
+	%_20 = icmp slt i32 0, %_18
+	%_21 = and i1 %_19, %_20
+	br i1 %_21, label %oob_ok_1, label %oob_err_1
  
 	oob_err_1: 
 	call void @throw_oob()
 	br label %oob_ok_1
  
 	oob_ok_1: 
-	%_32 = add i32 1, 0
-	%_33 = getelementptr i32, i32* %_27, i32 %_32
-	%_34 = load i32, i32* %_33
+	%_22 = add i32 1, 0
+	%_23 = getelementptr i32, i32* %_17, i32 %_22
+	%_24 = load i32, i32* %_23
 
-	store i32 %_34,i32* %ourint
+	store i32 %_24,i32* %ourint
 
-	%_35 = load i32, i32* %ourint
-	call void (i32) @print_int(i32 %_35)
+	%_25 = load i32, i32* %ourint
+	call void (i32) @print_int(i32 %_25)
 
-	%_36 = load i32*, i32** %nti
-	%_37 = load i32, i32* %_36
-	%_38 = icmp sge i32 0, 0
-	%_39 = icmp slt i32 0, %_37
-	%_40 = and i1 %_38, %_39
-	br i1 %_40, label %oob_ok_2, label %oob_err_2
+	%_26 = load i32*, i32** %nti
+	%_27 = load i32, i32* %_26
+	%_28 = icmp sge i32 0, 0
+	%_29 = icmp slt i32 0, %_27
+	%_30 = and i1 %_28, %_29
+	br i1 %_30, label %oob_ok_2, label %oob_err_2
  
 	oob_err_2: 
 	call void @throw_oob()
 	br label %oob_ok_2
  
 	oob_ok_2: 
-	%_41 = add i32 1, 0
-	%_42 = getelementptr i32, i32* %_36, i32 %_41
-	%_43 = load i32, i32* %_42
+	%_31 = add i32 1, 0
+	%_32 = getelementptr i32, i32* %_26, i32 %_31
+	%_33 = load i32, i32* %_32
 
-	ret i32 %_43
+	ret i32 %_33
 }
  

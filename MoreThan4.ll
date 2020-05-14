@@ -66,7 +66,6 @@ define i32 @MT4.Start(i8* %this, i32 %.p1, i32 %.p2, i32 %.p3, i32 %.p4, i32 %.p
 	%p6 = alloca i32
 	store i32 %.p6, i32* %p6
 	%aux = alloca i32
-
 	%_12 = load i32, i32* %p1
 	call void (i32) @print_int(i32 %_12)
 
@@ -85,23 +84,23 @@ define i32 @MT4.Start(i8* %this, i32 %.p1, i32 %.p2, i32 %.p3, i32 %.p4, i32 %.p
 	%_17 = load i32, i32* %p6
 	call void (i32) @print_int(i32 %_17)
 
-	%_26 = bitcast i8* %this to i8*** 
-	%_27 = load i8**, i8*** %_26 
-	%_28 = getelementptr i8*, i8** %_27, i32 1 
-	%_29 = load i8*, i8** %_28 
-	%_30 = bitcast i8* %_29 to i32 (i8* , i32, i32, i32, i32, i32, i32)* 
-	%_31 = load i32, i32* %p6
-	%_32 = load i32, i32* %p5
-	%_33 = load i32, i32* %p4
-	%_34 = load i32, i32* %p3
-	%_35 = load i32, i32* %p2
-	%_36 = load i32, i32* %p1
-	%_37 = call i32 %_30( i8* %this, i32 %_31, i32 %_32, i32 %_33, i32 %_34, i32 %_35, i32 %_36) 
+	%_21 = bitcast i8* %this to i8*** 
+	%_22 = load i8**, i8*** %_21 
+	%_23 = getelementptr i8*, i8** %_22, i32 1 
+	%_24 = load i8*, i8** %_23 
+	%_25 = bitcast i8* %_24 to i32 (i8* , i32, i32, i32, i32, i32, i32)* 
+	%_26 = load i32, i32* %p6
+	%_27 = load i32, i32* %p5
+	%_28 = load i32, i32* %p4
+	%_29 = load i32, i32* %p3
+	%_30 = load i32, i32* %p2
+	%_31 = load i32, i32* %p1
+	%_32 = call i32 %_25( i8* %this, i32 %_26, i32 %_27, i32 %_28, i32 %_29, i32 %_30, i32 %_31) 
 
-	store i32 %_37,i32* %aux
+	store i32 %_32,i32* %aux
 
-	%_38 = load i32, i32* %aux
-	ret i32 %_38
+	%_33 = load i32, i32* %aux
+	ret i32 %_33
 }
  
 define i32 @MT4.Change(i8* %this, i32 %.p1, i32 %.p2, i32 %.p3, i32 %.p4, i32 %.p5, i32 %.p6) {
@@ -117,23 +116,23 @@ define i32 @MT4.Change(i8* %this, i32 %.p1, i32 %.p2, i32 %.p3, i32 %.p4, i32 %.
 	store i32 %.p5, i32* %p5
 	%p6 = alloca i32
 	store i32 %.p6, i32* %p6
-	%_39 = load i32, i32* %p1
+	%_34 = load i32, i32* %p1
+	call void (i32) @print_int(i32 %_34)
+
+	%_35 = load i32, i32* %p2
+	call void (i32) @print_int(i32 %_35)
+
+	%_36 = load i32, i32* %p3
+	call void (i32) @print_int(i32 %_36)
+
+	%_37 = load i32, i32* %p4
+	call void (i32) @print_int(i32 %_37)
+
+	%_38 = load i32, i32* %p5
+	call void (i32) @print_int(i32 %_38)
+
+	%_39 = load i32, i32* %p6
 	call void (i32) @print_int(i32 %_39)
-
-	%_40 = load i32, i32* %p2
-	call void (i32) @print_int(i32 %_40)
-
-	%_41 = load i32, i32* %p3
-	call void (i32) @print_int(i32 %_41)
-
-	%_42 = load i32, i32* %p4
-	call void (i32) @print_int(i32 %_42)
-
-	%_43 = load i32, i32* %p5
-	call void (i32) @print_int(i32 %_43)
-
-	%_44 = load i32, i32* %p6
-	call void (i32) @print_int(i32 %_44)
 
 	ret i32 0
 }

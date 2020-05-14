@@ -170,6 +170,33 @@ public class SymbolTable {
 
   }
 
+  public String vtable_search(String mother, String id){
+
+    ClassTable current = this.get(mother);
+
+    if (current.mother == null){
+      return null;
+    }else{
+      boolean not_up = false;
+      ClassTable new_mother = this.get(current.mother);
+      if (new_mother.v_table != null){
+        if( new_mother.v_table.containsKey(id) ){
+            return current.mother;
+        }else{
+            not_up = true;
+        }
+      }
+
+      if( new_mother.v_table == null   ||  not_up == true  ){
+        return vtable_search(current.mother,id);
+      }
+    }
+
+    return null;
+
+
+  }
+
   //Adding a class to the classId table
   public void add_class(String id){
     
@@ -344,7 +371,7 @@ class ClassTable{
     return return_type;
 }
 
-  public String field_lookup(String id, LinkedHashMap<String, ClassTable> classId_table, int global_counter, FileWriter ll, boolean not_load ){
+  public String field_lookup(String id, LinkedHashMap<String, ClassTable> classId_table, LLVM_Visitor eval, FileWriter ll, boolean not_load ){
 
 
     String Type = null;
@@ -356,8 +383,8 @@ class ClassTable{
         offset = this.ot_table.get(id);
         String s_offset = String.valueOf(offset);//Now it will return "10"  
 
-        global_counter++;
-        String s = String.valueOf(global_counter);//Now it will return "10"  
+        eval.global_counter++;
+        String s = String.valueOf(eval.global_counter);//Now it will return "10"  
         String temps = "%_";
         temps = temps+s;
         
@@ -368,8 +395,8 @@ class ClassTable{
           e.printStackTrace();
         }
 
-        global_counter++;
-        String s1 = String.valueOf(global_counter);//Now it will return "10"  
+        eval.global_counter++;
+        String s1 = String.valueOf(eval.global_counter);//Now it will return "10"  
         String temps1 = "%_";
         temps1 = temps1+s1;
 
@@ -381,8 +408,8 @@ class ClassTable{
         }
 
         if (not_load != true){
-          global_counter++;
-          String s2 = String.valueOf(global_counter);//Now it will return "10"  
+          eval.global_counter++;
+          String s2 = String.valueOf(eval.global_counter);//Now it will return "10"  
           String temps2 = "%_";
           temps2 = temps2+s2;
 
@@ -401,7 +428,7 @@ class ClassTable{
       }else{
         if (this.mother != null ){
           ClassTable mother_t = classId_table.get(this.mother);
-          String reg = mother_t.field_lookup(id,classId_table, global_counter, ll, not_load);
+          String reg = mother_t.field_lookup(id,classId_table, eval, ll, not_load);
           return reg;
         }
         return null;
@@ -409,7 +436,7 @@ class ClassTable{
     }else{
       if (this.mother != null ){
         ClassTable mother_t = classId_table.get(this.mother);
-        String reg = mother_t.field_lookup(id,classId_table, global_counter, ll, not_load);
+        String reg = mother_t.field_lookup(id,classId_table, eval, ll, not_load);
         return reg;
       }
       return null;
@@ -470,6 +497,7 @@ class MethodTable{
 
   public LinkedHashMap<String, String> param_table ;
   public LinkedHashMap<String, String> local_table ;
+  public boolean already_printed;
 
   //GetKey function will return the key (of the parameter table) that corresponds to the "index" argument.
   public String getKey(int index) {

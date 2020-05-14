@@ -145,7 +145,7 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
         this.curr_class = class_name;
     
         n.f2.accept(this, argu);
-        n.f3.accept(this, argu);
+        //n.f3.accept(this, argu);
         n.f4.accept(this, argu);
         n.f5.accept(this, argu);
     
@@ -180,7 +180,7 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
         n.f3.accept(this, argu);
 
         n.f4.accept(this, argu);
-        n.f5.accept(this, argu);
+       //n.f5.accept(this, argu);
         n.f6.accept(this, argu);
         n.f7.accept(this, argu);
         return _ret;
@@ -194,8 +194,6 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
      public String visit(VarDeclaration n, String argu) throws Exception {
         String _ret=null;
 
-        ClassTable temp = visitor_sym.classId_table.get(curr_class);
-
         this.give_type = false;
         this.in_assign = false;
         String Type = n.f0.accept(this, argu);
@@ -204,19 +202,34 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
         this.give_type = false;
         this.in_assign = false;
         String id = n.f1.accept(this, argu);
-        
-        if (temp.field_table != null){
-          if (!temp.field_table.containsKey(id)){
-            ll.write("\t%"+id+" = alloca "+output_type+"\n");
-            ll.write("\n");
-          }else{
-            ll.write(""); //BS1
-          }
-        }else{
-          ll.write("\t%"+id+" = alloca "+output_type+"\n");
-          ll.write("\n");
-        }
 
+        
+        ClassTable temp = visitor_sym.classId_table.get(curr_class);
+        
+        if( temp.methodId_table != null){
+
+          if(temp.methodId_table.containsKey(curr_meth)){
+
+            Tuple<String,MethodTable> tupe = temp.methodId_table.get(curr_meth);
+
+            if (tupe.y.already_printed != true){
+          
+              if ( tupe.y.local_table != null ){
+                for (String i : tupe.y.local_table.keySet()) {
+
+                  String curr_Type = tupe.y.local_table.get(i);
+                  String output_type_arg = get_type(curr_Type);
+
+                  ll.write("\t%"+i+" = alloca "+output_type_arg+"\n");
+                  tupe.y.already_printed = true;
+                  
+                }
+            
+              }
+            }
+
+          }
+        }
 
         n.f2.accept(this, argu);
 
@@ -448,7 +461,7 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
     this.not_load = false;
 
 
-    global_counter = global_counter + 5;
+    //global_counter = global_counter + 5;
 
   
     n.f1.accept(this, argu);
@@ -557,7 +570,7 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
         }
       }
       this.not_load = false;
-      global_counter = global_counter + 5;
+      //global_counter = global_counter + 5;
 
       n.f1.accept(this, argu);
 
@@ -1101,6 +1114,7 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
         obj_type = hold_type;
       }
 
+    
       this.give_type = false;
       this.in_assign = true;
       String temps = n.f0.accept(this, argu);
@@ -1115,18 +1129,18 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
       
       Tuple<String, MethodTable> tupe;
 
-      if (temp.methodId_table != null ){
+      if (temp.v_table != null ){
 
-        if(temp.methodId_table.containsKey(meth_name)){
+        if(temp.v_table.containsKey(meth_name)){
           tupe = temp.methodId_table.get(meth_name);
         }else{
-          String new_mother = visitor_sym.mother_search(obj_type,meth_name);
+          String new_mother = visitor_sym.vtable_search(obj_type,meth_name);
           ClassTable mother_table = visitor_sym.get(new_mother);
           tupe = mother_table.methodId_table.get(meth_name);
         }
 
       }else{
-        String new_mother = visitor_sym.mother_search(obj_type,meth_name);
+        String new_mother = visitor_sym.vtable_search(obj_type,meth_name);
         ClassTable mother_table = visitor_sym.get(new_mother);
         tupe = mother_table.methodId_table.get(meth_name);
       }
@@ -1134,12 +1148,12 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
       int offset;
       if(temp.v_table==null){
 
-        String new_mother = visitor_sym.mother_search(obj_type,meth_name); 
+        String new_mother = visitor_sym.vtable_search(obj_type,meth_name); 
         ClassTable mother_table = visitor_sym.get(new_mother);
         
         offset = mother_table.v_table.get(meth_name);
       }else if(!temp.v_table.containsKey(meth_name)){
-        String new_mother = visitor_sym.mother_search(obj_type,meth_name); 
+        String new_mother = visitor_sym.vtable_search(obj_type,meth_name); 
         ClassTable mother_table = visitor_sym.get(new_mother);
         
         offset = mother_table.v_table.get(meth_name);
@@ -1200,8 +1214,6 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
 
       String temps6 = global_increment();
       ll.write("\t"+temps6+" = call "+output_type+ " "+ temps5+"( i8* "+temps);
-
-      System.out.println(meth_name);
 
       
       if (tupe.y.param_table != null ){
@@ -1361,11 +1373,11 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
       
       if (temp.mother != null ){
 
-        global_counter = global_counter + 5; //BS2
+       // global_counter = global_counter + 5; //BS2
         ClassTable mother_t = visitor_sym.classId_table.get(temp.mother);
-        String reg = mother_t.field_lookup(id, visitor_sym.classId_table, global_counter, ll, not_load ); 
+        String reg = mother_t.field_lookup(id, visitor_sym.classId_table, this, ll, not_load ); 
 
-        global_counter = global_counter + 5;//BS2
+       // global_counter = global_counter + 5;//BS2
 
         return reg;
 
@@ -1524,25 +1536,15 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
                 if (temp.mother != null ){
                   ClassTable mother_t = visitor_sym.classId_table.get(temp.mother);
                   Type = mother_t.recurse_lookup(id, visitor_sym.classId_table );
-                  if (Type == null){
-                    throw new Exception("Type error!");    
-                  }else{
-                    return Type;
-                  }
+                  return Type;
                 }
-                throw new Exception("Type error!");
               }
             }else{
               if (temp.mother != null ){
                 ClassTable mother_t = visitor_sym.classId_table.get(temp.mother);
                 Type = mother_t.recurse_lookup(id, visitor_sym.classId_table);
-                if (Type == null){
-                  throw new Exception("Type error!");    
-                }else{
-                  return Type;
-                }
+                return Type;
               }
-              throw new Exception("Type error!");
             }
           }
   
@@ -1560,25 +1562,15 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
                   if (temp.mother != null ){
                     ClassTable mother_t = visitor_sym.classId_table.get(temp.mother);
                     Type = mother_t.recurse_lookup(id, visitor_sym.classId_table );
-                    if (Type == null){
-                      throw new Exception("Type error!");    
-                    }else{
-                      return Type;
-                    }
+                    return Type;
                   }
-                  throw new Exception("Type error!");
                 }
               }else{
                 if (temp.mother != null ){
                   ClassTable mother_t = visitor_sym.classId_table.get(temp.mother);
                   Type = mother_t.recurse_lookup(id, visitor_sym.classId_table );
-                  if (Type == null){
-                    throw new Exception("Type error!");    
-                  }else{
-                    return Type;
-                  }
+                  return Type;
                 }
-                throw new Exception("Type error!");
               }
             }
           }
@@ -1597,25 +1589,15 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
                   if (temp.mother != null ){
                     ClassTable mother_t = visitor_sym.classId_table.get(temp.mother);
                     Type = mother_t.recurse_lookup(id, visitor_sym.classId_table );
-                    if (Type == null){
-                      throw new Exception("Type error!");    
-                    }else{
-                      return Type;
-                    }
+                    return Type;
                   }
-                  throw new Exception("Type error!");
                 }
               }else{
                 if (temp.mother != null ){
                   ClassTable mother_t = visitor_sym.classId_table.get(temp.mother);
                   Type = mother_t.recurse_lookup(id, visitor_sym.classId_table );
-                  if (Type == null){
-                    throw new Exception("Type error!");    
-                  }else{
-                    return Type;
-                  }
+                  return Type;
                 }
-                throw new Exception("Type error!");
               }
             }
           }
@@ -1637,25 +1619,16 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
                   if (temp.mother != null ){
                     ClassTable mother_t = visitor_sym.classId_table.get(temp.mother);
                     Type = mother_t.recurse_lookup(id, visitor_sym.classId_table );
-                    if (Type == null){
-                      throw new Exception("Type error!");    
-                    }else{
-                      return Type;
-                    }
+                    return Type;
                   }
-                  throw new Exception("Type error!");
+                  
                 }
               }else{
                 if (temp.mother != null ){
                   ClassTable mother_t = visitor_sym.classId_table.get(temp.mother);
                   Type = mother_t.recurse_lookup(id, visitor_sym.classId_table );
-                  if (Type == null){
-                    throw new Exception("Type error!");    
-                  }else{
-                    return Type;
-                  }
+                  return Type;
                 }
-                throw new Exception("Type error!");
               }
             }
           }
@@ -1876,7 +1849,7 @@ public class LLVM_Visitor extends GJDepthFirst<String, String>{
 
       String temps = global_increment();
 
-      ll.write(temps+" = xor i1 1, "+reg+"\n");
+      ll.write("\t"+temps+" = xor i1 1, "+reg+"\n");
       ll.write("\n");
       return temps;
     }

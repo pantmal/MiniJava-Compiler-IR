@@ -55,26 +55,25 @@ define i32 @Fac.ComputeFac(i8* %this, i32 %.num) {
 	%num = alloca i32
 	store i32 %.num, i32* %num
 	%num_aux = alloca i32
-
 	%_12 = load i32, i32* %num
 	%_13 = icmp slt i32 %_12, 1
 
 	br i1 %_13, label %if_then_0, label %if_else_0 
 	if_else_0: 
-	%_19 = load i32, i32* %num
-	%_23 = bitcast i8* %this to i8*** 
-	%_24 = load i8**, i8*** %_23 
-	%_25 = getelementptr i8*, i8** %_24, i32 0 
-	%_26 = load i8*, i8** %_25 
-	%_27 = bitcast i8* %_26 to i32 (i8* , i32)* 
-	%_28 = load i32, i32* %num
-	%_29 = sub i32 %_28, 1
+	%_14 = load i32, i32* %num
+	%_18 = bitcast i8* %this to i8*** 
+	%_19 = load i8**, i8*** %_18 
+	%_20 = getelementptr i8*, i8** %_19, i32 0 
+	%_21 = load i8*, i8** %_20 
+	%_22 = bitcast i8* %_21 to i32 (i8* , i32)* 
+	%_23 = load i32, i32* %num
+	%_24 = sub i32 %_23, 1
 
-	%_30 = call i32 %_27( i8* %this, i32 %_29) 
+	%_25 = call i32 %_22( i8* %this, i32 %_24) 
 
-	%_31 = mul i32 %_19, %_30
+	%_26 = mul i32 %_14, %_25
 
-	store i32 %_31,i32* %num_aux
+	store i32 %_26,i32* %num_aux
 
 	br label %if_end_0
 	if_then_0: 
@@ -83,7 +82,7 @@ define i32 @Fac.ComputeFac(i8* %this, i32 %.num) {
 	br label %if_end_0
 	if_end_0: 
 
-	%_37 = load i32, i32* %num_aux
-	ret i32 %_37
+	%_27 = load i32, i32* %num_aux
+	ret i32 %_27
 }
  

@@ -40,8 +40,8 @@ public class Main {
                 FileWriter myWriter = new FileWriter(ll_file);
                 
                 //Creating the offset table with the OffsetTable class.
-                OffsetCreator ot = new OffsetCreator(eval.visitor_sym);
-                ot.OutputCreator();
+                OffsetTable ot = new OffsetTable(eval.visitor_sym);
+                ot.OffsetCreator();
                 ot.VTableCreator(myWriter);
                 ot.BoilerPlate(myWriter);
 

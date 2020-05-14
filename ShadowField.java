@@ -15,8 +15,8 @@ class A {
     int x;
 
     public A foo(){
-	A y;
         A x;
+	int b;
         x = new A();
         return x;
     }

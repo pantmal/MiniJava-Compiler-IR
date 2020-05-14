@@ -39,28 +39,26 @@ define void @throw_nsz() {
  
 define i32 @main() {
 	%b = alloca i8*
-
 	%rv = alloca i32
+	%_0 = call i8* @calloc(i32 1, i32 0)
+	%_1 = bitcast i8* %_0 to i8*** 
+	%_2 = getelementptr [1 x i8*], [1 x i8*]* @.B_vtable, i32 0, i32 0 
+	store i8** %_2, i8*** %_1
 
-	%_5 = call i8* @calloc(i32 1, i32 0)
-	%_6 = bitcast i8* %_5 to i8*** 
-	%_7 = getelementptr [1 x i8*], [1 x i8*]* @.B_vtable, i32 0, i32 0 
-	store i8** %_7, i8*** %_6
+	store i8* %_0,i8** %b
 
-	store i8* %_5,i8** %b
+	%_3 = load i8*, i8** %b
+	%_7 = bitcast i8* %_3 to i8*** 
+	%_8 = load i8**, i8*** %_7 
+	%_9 = getelementptr i8*, i8** %_8, i32 0 
+	%_10 = load i8*, i8** %_9 
+	%_11 = bitcast i8* %_10 to i32 (i8* )* 
+	%_12 = call i32 %_11( i8* %_3) 
 
-	%_13 = load i8*, i8** %b
-	%_17 = bitcast i8* %_13 to i8*** 
-	%_18 = load i8**, i8*** %_17 
-	%_19 = getelementptr i8*, i8** %_18, i32 0 
-	%_20 = load i8*, i8** %_19 
-	%_21 = bitcast i8* %_20 to i32 (i8* )* 
-	%_22 = call i32 %_21( i8* %_13) 
+	store i32 %_12,i32* %rv
 
-	store i32 %_22,i32* %rv
-
-	%_23 = load i32, i32* %rv
-	call void (i32) @print_int(i32 %_23)
+	%_13 = load i32, i32* %rv
+	call void (i32) @print_int(i32 %_13)
 
 	ret i32 0
 }

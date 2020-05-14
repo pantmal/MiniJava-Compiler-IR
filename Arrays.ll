@@ -31,97 +31,96 @@ define void @throw_nsz() {
  
 define i32 @main() {
 	%x = alloca i32*
-
-	%_5 = add i32 1, 2
-	%_6 = icmp sge i32 %_5, 1
-	br i1 %_6, label %nsz_ok_0, label %nsz_err_0
+	%_0 = add i32 1, 2
+	%_1 = icmp sge i32 %_0, 1
+	br i1 %_1, label %nsz_ok_0, label %nsz_err_0
  
 	nsz_err_0: 
 	call void @throw_nsz()
 	br label %nsz_ok_0
  
 	nsz_ok_0: 
-	%_7 = call i8* @calloc(i32 %_5, i32 4) 
-	%_8 = bitcast i8* %_7 to i32* 
-	store i32 2, i32* %_8
+	%_2 = call i8* @calloc(i32 %_0, i32 4) 
+	%_3 = bitcast i8* %_2 to i32* 
+	store i32 2, i32* %_3
  
 
-	store i32* %_8,i32** %x
+	store i32* %_3,i32** %x
 
-	%_14 = load i32*, i32** %x
-	%_15 = load i32, i32* %_14
-	%_16 = icmp sge i32 0, 0
-	%_17 = icmp slt i32 0, %_15
-	%_18 = and i1 %_16, %_17
-	br i1 %_18, label %oob_ok_1, label %oob_err_1
+	%_4 = load i32*, i32** %x
+	%_5 = load i32, i32* %_4
+	%_6 = icmp sge i32 0, 0
+	%_7 = icmp slt i32 0, %_5
+	%_8 = and i1 %_6, %_7
+	br i1 %_8, label %oob_ok_1, label %oob_err_1
  
 	oob_err_1: 
 	call void @throw_oob()
 	br label %oob_ok_1
  
 	oob_ok_1: 
-	%_19 = add i32 1, 0
-	%_20 = getelementptr i32, i32* %_14, i32 %_19
-	store i32 1, i32* %_20
+	%_9 = add i32 1, 0
+	%_10 = getelementptr i32, i32* %_4, i32 %_9
+	store i32 1, i32* %_10
  
 
-	%_26 = load i32*, i32** %x
-	%_27 = load i32, i32* %_26
-	%_28 = icmp sge i32 1, 0
-	%_29 = icmp slt i32 1, %_27
-	%_30 = and i1 %_28, %_29
-	br i1 %_30, label %oob_ok_2, label %oob_err_2
+	%_11 = load i32*, i32** %x
+	%_12 = load i32, i32* %_11
+	%_13 = icmp sge i32 1, 0
+	%_14 = icmp slt i32 1, %_12
+	%_15 = and i1 %_13, %_14
+	br i1 %_15, label %oob_ok_2, label %oob_err_2
  
 	oob_err_2: 
 	call void @throw_oob()
 	br label %oob_ok_2
  
 	oob_ok_2: 
-	%_31 = add i32 1, 1
-	%_32 = getelementptr i32, i32* %_26, i32 %_31
-	store i32 2, i32* %_32
+	%_16 = add i32 1, 1
+	%_17 = getelementptr i32, i32* %_11, i32 %_16
+	store i32 2, i32* %_17
  
 
-	%_33 = load i32*, i32** %x
-	%_34 = load i32, i32* %_33
-	%_35 = icmp sge i32 0, 0
-	%_36 = icmp slt i32 0, %_34
-	%_37 = and i1 %_35, %_36
-	br i1 %_37, label %oob_ok_3, label %oob_err_3
+	%_18 = load i32*, i32** %x
+	%_19 = load i32, i32* %_18
+	%_20 = icmp sge i32 0, 0
+	%_21 = icmp slt i32 0, %_19
+	%_22 = and i1 %_20, %_21
+	br i1 %_22, label %oob_ok_3, label %oob_err_3
  
 	oob_err_3: 
 	call void @throw_oob()
 	br label %oob_ok_3
  
 	oob_ok_3: 
-	%_38 = add i32 1, 0
-	%_39 = getelementptr i32, i32* %_33, i32 %_38
-	%_40 = load i32, i32* %_39
+	%_23 = add i32 1, 0
+	%_24 = getelementptr i32, i32* %_18, i32 %_23
+	%_25 = load i32, i32* %_24
 
-	%_41 = load i32*, i32** %x
-	%_42 = load i32, i32* %_41
-	%_43 = icmp sge i32 1, 0
-	%_44 = icmp slt i32 1, %_42
-	%_45 = and i1 %_43, %_44
-	br i1 %_45, label %oob_ok_4, label %oob_err_4
+	%_26 = load i32*, i32** %x
+	%_27 = load i32, i32* %_26
+	%_28 = icmp sge i32 1, 0
+	%_29 = icmp slt i32 1, %_27
+	%_30 = and i1 %_28, %_29
+	br i1 %_30, label %oob_ok_4, label %oob_err_4
  
 	oob_err_4: 
 	call void @throw_oob()
 	br label %oob_ok_4
  
 	oob_ok_4: 
-	%_46 = add i32 1, 1
-	%_47 = getelementptr i32, i32* %_41, i32 %_46
-	%_48 = load i32, i32* %_47
+	%_31 = add i32 1, 1
+	%_32 = getelementptr i32, i32* %_26, i32 %_31
+	%_33 = load i32, i32* %_32
 
-	%_49 = add i32 %_40, %_48
+	%_34 = add i32 %_25, %_33
 
-	call void (i32) @print_int(i32 %_49)
+	call void (i32) @print_int(i32 %_34)
 
-	%_50 = load i32*, i32** %x
-	%_51 = load i32, i32* %_50
+	%_35 = load i32*, i32** %x
+	%_36 = load i32, i32* %_35
 
-	call void (i32) @print_int(i32 %_51)
+	call void (i32) @print_int(i32 %_36)
 
 	ret i32 0
 }
