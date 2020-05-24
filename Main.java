@@ -1,7 +1,7 @@
 import syntaxtree.*;
 import visitor.*;
 import java.io.*;
-import java.io.FileWriter;   // Import the FileWriter class
+import java.io.FileWriter;   //Import the FileWriter class
 
 
 public class Main {
@@ -32,19 +32,24 @@ public class Main {
                 System.out.print("\n");    
                 Goal root = parser.Goal();        
             
-                //If the parsing was successful, we move on to the FirstVisitor which will create the Symbol Table and perform declaration checks.
+                //If the parsing was successful, we move on to the FirstVisitor which will create the Symbol Table.
                 FirstVisitor eval = new FirstVisitor();
                 root.accept(eval, null);
                 
-
+                //Initializing a FileWriter object.
                 FileWriter myWriter = new FileWriter(ll_file);
                 
                 //Creating the offset table with the OffsetTable class.
                 OffsetTable ot = new OffsetTable(eval.visitor_sym);
                 ot.OffsetCreator();
+
+                //Creating and printing the v_tables for each class.
                 ot.VTableCreator(myWriter);
+
+                //Adding some boilerplate code which is included in all files.
                 ot.BoilerPlate(myWriter);
 
+                //Moving on to the LLVM visitor in order to finish writing the .ll file.
                 LLVM_Visitor ll_eval = new LLVM_Visitor(eval.visitor_sym,myWriter);
                 root.accept(ll_eval, null);
 
@@ -71,6 +76,7 @@ public class Main {
             catch(IOException ex){
                 System.err.println(ex.getMessage());
             }
+            
         }
 
 

@@ -2,7 +2,7 @@ import visitor.*;
 import syntaxtree.*;
 import java.util.*;
 
-//The First Visitor will create the Symbol Table so the Second Visitor can perform type checks.
+//The First Visitor will create the Symbol Table so the LLVM Visitor can create the .ll files.
 public class FirstVisitor extends GJDepthFirst<String, String>{
       
     public SymbolTable visitor_sym;
@@ -40,10 +40,8 @@ public class FirstVisitor extends GJDepthFirst<String, String>{
 
       String main_class = n.f1.accept(this, argu);
 
-
-      //Otherwise add the classId to the table.
+      //Add the classId to the table.
       visitor_sym.add_class(main_class);
-
 
       n.f2.accept(this, argu);
       n.f3.accept(this, argu);
@@ -54,10 +52,8 @@ public class FirstVisitor extends GJDepthFirst<String, String>{
 
       ClassTable current = visitor_sym.get_last();
 
-      
-      //Otherwise add the main method.
+      //Add the main method.
       current.meth_insert(id, ret_Type);
-
 
       n.f7.accept(this, argu);
       n.f8.accept(this, argu);
@@ -69,8 +65,7 @@ public class FirstVisitor extends GJDepthFirst<String, String>{
 
       MethodTable curr_meth = current.get_last_meth();
 
-
-      //Otherwise add them to the parameter table
+      //Add the arguments to the parameter table
       curr_meth.p_insert(args, "String[]");
 
       n.f12.accept(this, argu);
@@ -98,7 +93,6 @@ public class FirstVisitor extends GJDepthFirst<String, String>{
       }
 
 
-
       String _ret=null;
       String class_id;
 
@@ -106,7 +100,7 @@ public class FirstVisitor extends GJDepthFirst<String, String>{
       class_id = n.f1.accept(this, argu);
 
 
-      //Otherwise add the classId to the table.
+      //Add the classId to the table.
       visitor_sym.add_class(class_id);
 
       n.f2.accept(this, argu);
@@ -130,12 +124,7 @@ public class FirstVisitor extends GJDepthFirst<String, String>{
     */
     public String visit(ClassExtendsDeclaration n, String argu) throws Exception {
 
-      //If the symbol table is null, throw an exception.
-      if (this.visitor_sym == null){
-            throw new Exception("Declaration error!");
-      }
-
-
+      
       String _ret=null;
 
       String class_id;
@@ -143,7 +132,7 @@ public class FirstVisitor extends GJDepthFirst<String, String>{
       n.f0.accept(this, argu);
       class_id = n.f1.accept(this, argu);
 
-      //Otherwise add the classId to the table.
+      //Add the classId to the table.
       visitor_sym.add_class(class_id);
 
       n.f2.accept(this, argu);
@@ -151,8 +140,7 @@ public class FirstVisitor extends GJDepthFirst<String, String>{
       ClassTable current = visitor_sym.get_last();
       String mother = n.f3.accept(this, argu);
       
-
-      //Otherwise, add the mother's name to the ClassTable.
+      //Add the mother's name to the ClassTable.
       current.mother = mother;
 
       n.f3.accept(this, argu);
@@ -173,6 +161,7 @@ public class FirstVisitor extends GJDepthFirst<String, String>{
     */
    public String visit(VarDeclaration n, String argu) throws Exception {
       String _ret=null;
+      
       String Type, id;
 
       //Getting the last ClassTable of the Symbol Table.
@@ -182,7 +171,6 @@ public class FirstVisitor extends GJDepthFirst<String, String>{
       Type = n.f0.accept(this, argu);
       Type = Type.toString();
       
-
       id = n.f1.accept(this, argu);
 
       n.f2.accept(this, argu);
@@ -234,7 +222,7 @@ public class FirstVisitor extends GJDepthFirst<String, String>{
       ret_Type = n.f1.accept(this, argu);
       id = n.f2.accept(this, argu);
 
-      
+      //Adding the method.
       current.meth_insert(id, ret_Type);
 
       n.f3.accept(this, argu);
@@ -270,6 +258,7 @@ public class FirstVisitor extends GJDepthFirst<String, String>{
       Type = n.f0.accept(this, argu);
       id = n.f1.accept(this, argu);
 
+      //Adding the parameter to the parameter table.
       curr_meth.p_insert(id, Type);
 
 

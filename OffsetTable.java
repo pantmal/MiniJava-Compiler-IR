@@ -1,8 +1,8 @@
 import visitor.*;
 import syntaxtree.*;
 import java.util.*;
-import java.io.FileWriter;   // Import the FileWriter class
-import java.io.IOException;  // Import the IOException class to handle errors
+import java.io.FileWriter;   //Import the FileWriter class
+import java.io.IOException;  //Import the IOException class to handle errors
 
 
 //Offset Table will create the offsets of a semantically correct Minijava program.
@@ -15,7 +15,7 @@ public class OffsetTable {
         this.visitor_sym = st;   
     }
 
-    //OutputCreator function creates our output.
+    //OffsetCreator function creates our offsets as well as some information needed for the V-tables.
     public void OffsetCreator(){
 
         //For every class in the classId table
@@ -31,12 +31,8 @@ public class OffsetTable {
                 }
             }
 
-            //System.out.println("-------Class "+id+"-------" );
-
-            //Getting the field offsets.
-            //System.out.println("--Variables--" );
+            //Getting the field offsets. They will be added in the ot_table field of the ClassTable object.
             if(temp.field_table!=null){
-
 
                 int counter = 0; //Counter of which field we're on.
                 int ot_sum = 0; //Ot_sum is the sum of all field offsets.
@@ -52,11 +48,10 @@ public class OffsetTable {
                     String Type = temp.field_table.get(f_id);
                     last_type = Type;
                     
-                    //If it's the first field print 0, except if we're in a hierarchy. If so, get the offset sum of the previous mother class.
+                    //If it's the first field add 8, except if we're in a hierarchy. If so, get the offset sum of the previous mother class.
                     if (counter == 0){
                         if(temp.mother == null){
-                            //System.out.println(id+"."+f_id+" : 0" );
-                            temp.ot_insert(f_id,8);
+                            temp.ot_insert(f_id,8); //Adding 8 because the first 8 bytes are reserved for the V-table pointer.
                         }else{
                             
                             //Getting the last offset sum from the mother class.
@@ -79,8 +74,6 @@ public class OffsetTable {
                                 temp.ot_insert(f_id,last_count+8);
                             }
                             
-                            //System.out.println(id+"."+f_id+" : "+last_count );
-
                             //Used for the next child classes.
                             ot_sum = last_count;
                         }
@@ -121,8 +114,6 @@ public class OffsetTable {
 
                         }
 
-                        //System.out.println(id+"."+f_id+" : "+sum );
-
                         ot_sum = sum;
 
                     }
@@ -152,42 +143,42 @@ public class OffsetTable {
                 temp.ot_sum = ot_sum;
                 temp.last_type = last_type_s;
 
+                //Storing the size for later on.
                 temp.size = size+8;
 
                 
             }else{
-                if(temp.mother == null){
+
+                if(temp.mother == null){ //If a class doesn't have any fields then its size is 8 bytes (from the V-table pointer).
                     temp.size = 8;
                 }else{
-                    temp.size = visitor_sym.find_size(id);
+                    temp.size = visitor_sym.find_size(id); //If we're in hierarchy we get the size of the previous mother class.
                 }
                 
             }
 
-            //Moving on to the method offsets.
-            //System.out.println("--Methods--" );
+            //Moving on to the method offsets. They will be added in the v_table field of the ClassTable object.
             if(temp.methodId_table!=null){
                 
                 int counter = 0; //Counter of which methodId we're on.
-                int mt_sum = 0; //Mt_sum is the sum of all metthod offsets.
-                int v_count = 0;
+                int mt_sum = 0; //Mt_sum is the sum of all method offsets.
+                int v_count = 0; //V_count stores the position of the method in the V-table.
 
                 int last_count = 0; //Used in case we're in a hierarchy.
 
                 for (String m_id : temp.methodId_table.keySet()) {
 
-                    //If we're in a hierarchy we need to skip overriden functions.
+                    //If we're in a hierarchy we need to skip overriden functions. 
                     String new_mother = visitor_sym.mother_search(id,m_id);
                     if (new_mother != null){
-                        temp.over_insert(m_id);
+                        temp.over_insert(m_id); //We will store the overriden functions in a table which will be used when we will create the V-table in the .ll file.
                         continue;
                     }
 
-                    //If it's the first method print 0, except if we're in a hierarchy. If so, get the offset sum of the previous mother class.
+                    //Adding the name of the method and its position.
                     if (counter == 0){
                         
                         if(temp.mother == null){
-                            //System.out.println(id+"."+m_id+" : 0" );
                             temp.vt_insert(m_id,v_count);
                             v_count++;
 
@@ -196,6 +187,7 @@ public class OffsetTable {
                             //Getting the last offset sum from the mother class.
                             last_count = visitor_sym.find_methodId_table(id);
 
+                            //Getting the last position with the "find_v_table" function, since we're in hierarchy.
                             v_count = visitor_sym.find_v_table(id);
                             v_count++;
 
@@ -206,7 +198,6 @@ public class OffsetTable {
                                 last_count = last_count + 8;
                             }
 
-                            //System.out.println(id+"."+m_id+" : "+last_count );
                             temp.vt_insert(m_id,v_count);
                             v_count++;
 
@@ -232,12 +223,9 @@ public class OffsetTable {
                         while(w_counter >= 0 ){
 
                             sum = sum + 8;
-
                             w_counter--;
 
                         }
-
-                        //System.out.println(id+"."+m_id+" : "+sum );
 
                         mt_sum = sum;
 
@@ -245,17 +233,16 @@ public class OffsetTable {
                     counter++;
                 }
 
-                //Storing the method offset sum in the Class Table.
+                //Storing the method offset sum and the last position of the current v-table in the Class Table.
                 temp.mt_sum = mt_sum;
                 temp.last_vcount = --v_count;
 
             }
-
-            System.out.print("\n");
        }
 
     }
 
+    //Getting the appropriate type in LLVM format.
     public String get_type(String type){
         String return_type = null;
         if(type == "int" ){
@@ -274,24 +261,29 @@ public class OffsetTable {
         return return_type;
     }
 
-
+    //VTableCreator will print the Vtables in the .ll file.
     public void VTableCreator(FileWriter ll){
 
+        //For every class in the classId table.
         for (String id : visitor_sym.classId_table.keySet()) {
             
+            //We get its class table.
             ClassTable temp = visitor_sym.classId_table.get(id);
 
+            //If it's not in a hierarchy.
             if (temp.mother == null){
 
                 try {
                     if (temp.methodId_table!=null){
-                        if(temp.methodId_table.containsKey("main")){
+                        if(temp.methodId_table.containsKey("main")){ //Special case for the Main class/function.
                             ll.write("@."+id+"_vtable = global [0 x i8*] [] \n \n");
                             continue;
                         }
                     }
 
                     if (temp.v_table!=null){
+
+                        //Getting the size of the v-table using the last position.
                         int v_table_size = temp.get_last_v();
                         v_table_size++;
 
@@ -299,20 +291,19 @@ public class OffsetTable {
                         if(temp.methodId_table!=null){
                 
                             int m_count = 0;
-                            for (String m_id : temp.methodId_table.keySet()) {
+                            for (String m_id : temp.methodId_table.keySet()) { //For every method of this class.
                                 
                                 Tuple<String, MethodTable> tupe;
-                                tupe = temp.methodId_table.get(m_id);
+                                tupe = temp.methodId_table.get(m_id); //Getting the tuple containing its type and MethodTable object.
 
-                                String return_type = get_type(tupe.x);
-                                
+                                String return_type = get_type(tupe.x); //Printing its return type.
                                 ll.write("\ti8* bitcast ("+return_type+" (i8*");
 
                                 int p_count = 0 ;
 
-                                if (tupe.y.param_table == null){
+                                if (tupe.y.param_table == null){ //Close the brackets if there aren't any parameters.
                                     ll.write(")*");
-                                }else{
+                                }else{ //Otherwise print the output type of its parameter.
 
                                     ll.write(",");
 
@@ -335,12 +326,12 @@ public class OffsetTable {
                                     }
                                 }
                                 
-                                ll.write(" @"+id+"."+m_id+" to i8*)");
+                                ll.write(" @"+id+"."+m_id+" to i8*)");//Printing the names.
 
                                 m_count++;
-                                if(m_count == v_table_size){
+                                if(m_count == v_table_size){ //No more methods left.
                                     ll.write("\n]\n \n");
-                                }else{
+                                }else{ //We still have methods so print a comma.
                                     ll.write(",\n");
                                 }
 
@@ -349,7 +340,7 @@ public class OffsetTable {
 
                         }
 
-                    }else{
+                    }else{ //Printing an empty v-table if there aren't any methods.
                         ll.write("@."+id+"_vtable = global [0 x i8*] [] \n");
                     }
 
@@ -361,32 +352,32 @@ public class OffsetTable {
 
                 
 
-            }else{
+            }else{ //Now we're in a hierarchy
                 
                 try {
-                    Stack hierarchy = new Stack(); 
-                    visitor_sym.recurse_push(hierarchy,id);
 
-                    //Add checks!
+                    //We will use a Stack which will contain every class of this hierarchy.
+                    Stack hierarchy = new Stack(); 
+                    visitor_sym.recurse_push(hierarchy,id); //Adding every class with the "recurse_push" function.
 
                     int v_table_size = 0;
-                    if(temp.v_table == null){
+                    if(temp.v_table == null){ //Getting the last position with the "find_v_table" function, since we're in hierarchy and the current v-table is null.
                         v_table_size = visitor_sym.find_v_table(id);
                         v_table_size++;
-                    }else{
+                    }else{ //Getting the size of the v-table using the last position.
                         v_table_size = temp.get_last_v();
                         v_table_size++;
                     }
 
                     
-
                     ll.write("@."+id+"_vtable = global [ "+v_table_size+ " x i8*] [  \n");
 
                     int m_count = 0;
-                    while(hierarchy.empty()==false){
+                    String last_char = null;
+                    while(hierarchy.empty()==false){ //For every class of the hierarchy.
 
         
-                        String curr_id = (String) hierarchy.peek(); //Getting the last counter.
+                        String curr_id = (String) hierarchy.peek(); //Getting the class at the top and its ClassTable.
                         ClassTable curr_temp = visitor_sym.classId_table.get(curr_id);
 
                         
@@ -394,18 +385,21 @@ public class OffsetTable {
                                                         
                             if(curr_temp.methodId_table!=null){
                     
-                                for (String m_id : curr_temp.methodId_table.keySet()) {
-
+                                for (String m_id : curr_temp.methodId_table.keySet()) { //For every method of this class.
                                     
-                                    if (m_count > 0){
+                                    if (m_count > 0 && last_char!=","){
                                         ll.write(",\n");
+                                        last_char = ",";
                                     }
 
                                     String child_class = null;
 
-
+                                    //In this loop we will go to every "overriden_functions" table of each child and replace the name of the class if need be.
+                                    //Example: If a foo() function is overriden in a hierarchy consisting of "Base" and "Derived" classes we will have to print "Derived.get" at the V-table of the Derived class. 
                                     for(int i = hierarchy.size() - 1; i >= 0; i--){
                                         String obj = (String) hierarchy.get(i);
+
+                                        //Skipping the class we're currently on.
                                         if(curr_id == obj){
                                             continue;
                                         }
@@ -413,13 +407,15 @@ public class OffsetTable {
                                         ClassTable obj_temp = visitor_sym.classId_table.get(obj);
 
                                         if(obj_temp.overriden_functions != null){
+
+                                            //Child class has an overriden version of our current method so we print the child class later on.
                                             if(obj_temp.overriden_functions.contains(m_id)){
                                                 child_class = obj;
                                             }
                                         }
                                     }
             
-                                    
+                                    //Skip overriden functions.
                                     String new_mother = visitor_sym.mother_search(curr_id,m_id);
                                     if (new_mother != null){
                                         m_count++;
@@ -427,16 +423,15 @@ public class OffsetTable {
                                     }
                                     
                                     Tuple<String, MethodTable> tupe;
-                                    tupe = curr_temp.methodId_table.get(m_id);
+                                    tupe = curr_temp.methodId_table.get(m_id);//Getting the tuple containing its type and MethodTable object.
 
-                                    String return_type = get_type(tupe.x);
-                                    
+                                    String return_type = get_type(tupe.x);//Printing its return type.
                                     ll.write("\ti8* bitcast ("+return_type+" (i8*");
 
                                     int p_count = 0 ;
-                                    if (tupe.y.param_table == null){
+                                    if (tupe.y.param_table == null){//Close the brackets if there aren't any parameters.
                                         ll.write(")*");
-                                    }else{
+                                    }else{ //Otherwise print the output type of its parameter.
 
                                         ll.write(",");
 
@@ -459,13 +454,14 @@ public class OffsetTable {
                                         }
                                     }
                                     
-                                    
+                                    //Print updated "child_class" if we have an overriden method. Otherwise print the name of the class we're on.
                                     if (child_class == null){
                                         ll.write(" @"+curr_id+"."+m_id+" to i8*)");
+                                        last_char = ")";
                                     }else{
                                         ll.write(" @"+child_class+"."+m_id+" to i8*)");
+                                        last_char = ")";
                                     }
-
 
                                     m_count++;
                                                             
@@ -474,30 +470,25 @@ public class OffsetTable {
 
                             }
 
-                        }//else{
-                        //    ll.write("\n");
-                        //}
-                        hierarchy.pop();
+                        }
+                        hierarchy.pop(); //We did all necessary work for this class, so remove it from the hierarchy Stack.
 
                     }
 
-                    ll.write("\n]\n \n");
+                    ll.write("\n]\n \n"); //Closing the v-table.
 
                 }catch (IOException e) {
                     System.out.println("An error occurred.");
                     e.printStackTrace();
                 }
 
-
             }
 
         }
-
-    
-    
+        
     }
 
-
+    //This boilerplate code is included in every file. It consists of information regarding prints, out of bounds exceptions etc.
     public void BoilerPlate(FileWriter ll){
 
         try{
@@ -537,7 +528,6 @@ public class OffsetTable {
 
 
     }
-
 
     
 }

@@ -12,7 +12,7 @@ public class SymbolTable {
 
   LinkedHashMap<String, ClassTable> classId_table;
 
-
+  //recurse_push adds every class in a hierarchy stack.
   public void recurse_push(Stack hierarchy, String id){
 
     hierarchy.push(id);
@@ -32,7 +32,7 @@ public class SymbolTable {
 
   }
 
-
+  //Getting the last v-table in a hierarchy.
   public int find_v_table(String id){
 
     ClassTable current = this.get(id);
@@ -50,6 +50,7 @@ public class SymbolTable {
   
   }
 
+  //Getting the size of the last class that had a size>8.
   public int find_size(String id){
 
     ClassTable current = this.get(id);
@@ -170,6 +171,7 @@ public class SymbolTable {
 
   }
 
+  //Similar to mother_search but for v-tables.
   public String vtable_search(String mother, String id){
 
     ClassTable current = this.get(mother);
@@ -259,6 +261,7 @@ class ClassTable{
   public LinkedHashMap<String, Integer> v_table ;
 
 
+  //Adding an overriden function in said table.
   public void over_insert(String id){
 
     if (overriden_functions == null){
@@ -270,7 +273,7 @@ class ClassTable{
   }
 
 
-    //Getting the last ClassTable of the classId table
+  //Getting the last position of this v-table.  
   public int get_last_v(){
 
     String lKeyLast = null ;
@@ -284,6 +287,7 @@ class ClassTable{
 
   }
 
+  //Adding a field and its offset in the ot_table.
   public void ot_insert(String id, int offset){
     if (ot_table == null){
         ot_table = new LinkedHashMap<String, Integer>();
@@ -291,6 +295,7 @@ class ClassTable{
     ot_table.put(id, offset);
   }
 
+  //Adding a method and its position in the v_table.
   public void vt_insert(String id, int index){
     if (v_table == null){
         v_table = new LinkedHashMap<String, Integer>();
@@ -353,6 +358,7 @@ class ClassTable{
 
   }
 
+  //Getting the appropriate type in LLVM format.
   public String get_type(String type, LinkedHashMap<String, ClassTable> classId_table){
     String return_type = null;
     if(type == "int" ){
@@ -369,8 +375,9 @@ class ClassTable{
     }
 
     return return_type;
-}
+  }
 
+  //field_lookup will search throughout the class hierarchy to find the "id" argument and print the appropriate commands to access it.
   public String field_lookup(String id, LinkedHashMap<String, ClassTable> classId_table, LLVM_Visitor eval, FileWriter ll, boolean not_load ){
 
 
@@ -378,17 +385,19 @@ class ClassTable{
     int offset = 0;
     if( this.field_table != null  ){
       if( this.field_table.containsKey(id) ) {
+
+        //Getting its output type and its offset.
         Type = this.field_table.get(id);
         String output_type = get_type(Type, classId_table);
         offset = this.ot_table.get(id);
-        String s_offset = String.valueOf(offset);//Now it will return "10"  
+        String s_offset = String.valueOf(offset);
 
         eval.global_counter++;
-        String s = String.valueOf(eval.global_counter);//Now it will return "10"  
+        String s = String.valueOf(eval.global_counter);
         String temps = "%_";
         temps = temps+s;
         
-        try {
+        try { //Getting a pointer of the field we need using the offset.
           ll.write("\t"+temps+" = getelementptr i8, i8* %this, i32 "+s_offset+"\n");
         }catch (IOException e) {
           System.out.println("An error occurred.");
@@ -396,20 +405,20 @@ class ClassTable{
         }
 
         eval.global_counter++;
-        String s1 = String.valueOf(eval.global_counter);//Now it will return "10"  
+        String s1 = String.valueOf(eval.global_counter);
         String temps1 = "%_";
         temps1 = temps1+s1;
 
-        try{
+        try{ //Perform the necessary bitcast.
           ll.write("\t"+temps1+" = bitcast i8* "+temps+" to "+output_type+"* \n");
         }catch (IOException e) {
           System.out.println("An error occurred.");
           e.printStackTrace();
         }
 
-        if (not_load != true){
+        if (not_load != true){ //If not_load is false we also get the value of the field.
           eval.global_counter++;
-          String s2 = String.valueOf(eval.global_counter);//Now it will return "10"  
+          String s2 = String.valueOf(eval.global_counter);
           String temps2 = "%_";
           temps2 = temps2+s2;
 
@@ -425,7 +434,7 @@ class ClassTable{
 
         return temps1;
         
-      }else{
+      }else{ //It's not in this field table, so recursively call the function.
         if (this.mother != null ){
           ClassTable mother_t = classId_table.get(this.mother);
           String reg = mother_t.field_lookup(id,classId_table, eval, ll, not_load);
@@ -433,7 +442,7 @@ class ClassTable{
         }
         return null;
       }
-    }else{
+    }else{ //This field table is empty, so recursively call the function.
       if (this.mother != null ){
         ClassTable mother_t = classId_table.get(this.mother);
         String reg = mother_t.field_lookup(id,classId_table, eval, ll, not_load);
@@ -443,7 +452,6 @@ class ClassTable{
     }
 
   }
-
 
 
   //f_insert adds a variable and its type to the field table.
@@ -531,7 +539,4 @@ class MethodTable{
 
 
 }
-
-
-
 
